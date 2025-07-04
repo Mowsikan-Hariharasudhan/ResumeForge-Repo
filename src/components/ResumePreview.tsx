@@ -42,7 +42,7 @@ export const ResumeFieldVisibility: React.FC<{
 );
 
 // Helper to render all resume fields, respecting visibility
-export const RenderAllFields: React.FC<{ data: ResumeData | undefined | null; visibleFields: Record<string, boolean> }> = ({ data, visibleFields }) => {
+export const RenderAllFields: React.FC<{ data: ResumeData | undefined | null; visibleFields?: Record<string, boolean> }> = ({ data, visibleFields }) => {
   if (!data || typeof data !== 'object') {
     return <div className="text-red-600">No resume data available.</div>;
   }
@@ -64,31 +64,48 @@ export const RenderAllFields: React.FC<{ data: ResumeData | undefined | null; vi
     certifications: Array.isArray(data.certifications) ? data.certifications : [],
     projects: Array.isArray(data.projects) ? data.projects : [],
   };
+  const safeVisibleFields = visibleFields || {
+    fullName: true,
+    email: true,
+    phone: true,
+    location: true,
+    website: true,
+    linkedin: true,
+    github: true,
+    summary: true,
+    achievements: true,
+    experience: true,
+    education: true,
+    skills: true,
+    languages: true,
+    certifications: true,
+    projects: true,
+  };
   return (
     <div className="space-y-4">
-      {visibleFields.fullName && (
+      {safeVisibleFields.fullName && (
         <div>
           <h2 className="text-2xl font-bold">{safeData.fullName}</h2>
           <div className="flex flex-wrap gap-4 text-gray-600">
-            {visibleFields.email && safeData.email && <span>{safeData.email}</span>}
-            {visibleFields.phone && safeData.phone && <span>{safeData.phone}</span>}
-            {visibleFields.location && safeData.location && <span>{safeData.location}</span>}
+            {safeVisibleFields.email && safeData.email && <span>{safeData.email}</span>}
+            {safeVisibleFields.phone && safeData.phone && <span>{safeData.phone}</span>}
+            {safeVisibleFields.location && safeData.location && <span>{safeData.location}</span>}
           </div>
           <div className="flex flex-wrap gap-4 text-blue-600 mt-2">
-            {visibleFields.website && safeData.website && <a href={safeData.website} className="hover:underline">{safeData.website}</a>}
-            {visibleFields.linkedin && safeData.linkedin && <a href={safeData.linkedin} className="hover:underline">LinkedIn</a>}
-            {visibleFields.github && safeData.github && <a href={safeData.github} className="hover:underline">GitHub</a>}
+            {safeVisibleFields.website && safeData.website && <a href={safeData.website} className="hover:underline">{safeData.website}</a>}
+            {safeVisibleFields.linkedin && safeData.linkedin && <a href={safeData.linkedin} className="hover:underline">LinkedIn</a>}
+            {safeVisibleFields.github && safeData.github && <a href={safeData.github} className="hover:underline">GitHub</a>}
           </div>
         </div>
       )}
-      {visibleFields.summary && safeData.summary && <div><h3 className="font-semibold">Summary</h3><p>{safeData.summary}</p></div>}
-      {visibleFields.achievements && safeData.achievements.length > 0 && (
+      {safeVisibleFields.summary && safeData.summary && <div><h3 className="font-semibold">Summary</h3><p>{safeData.summary}</p></div>}
+      {safeVisibleFields.achievements && safeData.achievements.length > 0 && (
         <div>
           <h3 className="font-semibold">Key Achievements</h3>
           <ul className="list-disc ml-6">{safeData.achievements.map((ach, i) => <li key={i}>{ach}</li>)}</ul>
         </div>
       )}
-      {visibleFields.experience && safeData.experience.length > 0 && (
+      {safeVisibleFields.experience && safeData.experience.length > 0 && (
         <div>
           <h3 className="font-semibold">Experience</h3>
           <ul className="list-disc ml-6">{safeData.experience.map((exp, i) => (
@@ -96,7 +113,7 @@ export const RenderAllFields: React.FC<{ data: ResumeData | undefined | null; vi
           ))}</ul>
         </div>
       )}
-      {visibleFields.education && safeData.education.length > 0 && (
+      {safeVisibleFields.education && safeData.education.length > 0 && (
         <div>
           <h3 className="font-semibold">Education</h3>
           <ul className="list-disc ml-6">{safeData.education.map((edu, i) => (
@@ -104,19 +121,19 @@ export const RenderAllFields: React.FC<{ data: ResumeData | undefined | null; vi
           ))}</ul>
         </div>
       )}
-      {visibleFields.skills && safeData.skills.length > 0 && (
+      {safeVisibleFields.skills && safeData.skills.length > 0 && (
         <div>
           <h3 className="font-semibold">Skills</h3>
           <div className="flex flex-wrap gap-2">{safeData.skills.map((skill, i) => <span key={i} className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">{skill}</span>)}</div>
         </div>
       )}
-      {visibleFields.languages && safeData.languages.length > 0 && (
+      {safeVisibleFields.languages && safeData.languages.length > 0 && (
         <div>
           <h3 className="font-semibold">Languages</h3>
           <div className="flex flex-wrap gap-2">{safeData.languages.map((lang, i) => <span key={i} className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">{lang}</span>)}</div>
         </div>
       )}
-      {visibleFields.certifications && safeData.certifications.length > 0 && (
+      {safeVisibleFields.certifications && safeData.certifications.length > 0 && (
         <div>
           <h3 className="font-semibold">Certifications</h3>
           <ul className="list-disc ml-6">{safeData.certifications.map((cert, i) => (
@@ -124,7 +141,7 @@ export const RenderAllFields: React.FC<{ data: ResumeData | undefined | null; vi
           ))}</ul>
         </div>
       )}
-      {visibleFields.projects && safeData.projects.length > 0 && (
+      {safeVisibleFields.projects && safeData.projects.length > 0 && (
         <div>
           <h3 className="font-semibold">Projects</h3>
           <ul className="list-disc ml-6">{safeData.projects.map((proj, i) => (
