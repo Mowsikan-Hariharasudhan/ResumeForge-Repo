@@ -10,12 +10,14 @@ interface EnhancedResumePreviewProps {
   data: ResumeData;
   template: string;
   className?: string;
+  visibleFields: Record<string, boolean>;
 }
 
 export const EnhancedResumePreview = ({ 
   data, 
   template, 
-  className 
+  className, 
+  visibleFields 
 }: EnhancedResumePreviewProps) => {
   const [zoom, setZoom] = useState(0.6);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -92,7 +94,6 @@ export const EnhancedResumePreview = ({
                 {getTemplateDisplayName(template)}
               </Badge>
             </div>
-            
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-1 border rounded-md p-1">
                 <Button
@@ -104,11 +105,9 @@ export const EnhancedResumePreview = ({
                 >
                   <ZoomOut className="w-3 h-3" />
                 </Button>
-                
                 <span className="text-xs font-mono min-w-[3rem] text-center">
                   {Math.round(zoom * 100)}%
                 </span>
-                
                 <Button
                   variant="ghost"
                   size="sm"
@@ -118,7 +117,6 @@ export const EnhancedResumePreview = ({
                 >
                   <ZoomIn className="w-3 h-3" />
                 </Button>
-                
                 <Button
                   variant="ghost"
                   size="sm"
@@ -128,7 +126,6 @@ export const EnhancedResumePreview = ({
                   <RotateCcw className="w-3 h-3" />
                 </Button>
               </div>
-              
               <Button
                 variant="ghost"
                 size="sm"
@@ -143,29 +140,19 @@ export const EnhancedResumePreview = ({
               </Button>
             </div>
           </div>
-          
-          <p className="text-xs text-gray-600">
-            Use Ctrl/Cmd + Plus/Minus to zoom, or use the controls above
-          </p>
         </CardHeader>
-        
-        <CardContent className="p-6 h-full overflow-auto">
-          <div className="flex justify-center">
-            <div 
-              ref={previewRef}
-              className="resume-preview bg-white shadow-lg transition-transform duration-200"
-              style={{ 
-                width: '210mm',
-                minHeight: '297mm',
-                transform: `scale(${zoom})`,
-                transformOrigin: 'top center',
-                marginBottom: zoom < 0.6 ? '-200px' : '0'
-              }}
-            >
-              <ResumePreview data={data} template={template} />
-            </div>
+        <div
+          ref={previewRef}
+          className="relative bg-gray-100 flex justify-center items-center overflow-auto"
+          style={{ height: isFullscreen ? 'calc(100vh - 60px)' : '600px' }}
+        >
+          <div
+            className="transition-transform duration-200"
+            style={{ transform: `scale(${zoom})`, transformOrigin: 'top center', width: '100%' }}
+          >
+            <ResumePreview data={data} template={template} visibleFields={visibleFields} />
           </div>
-        </CardContent>
+        </div>
       </Card>
     </div>
   );

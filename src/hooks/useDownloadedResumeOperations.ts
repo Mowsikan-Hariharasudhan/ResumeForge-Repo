@@ -1,7 +1,6 @@
-
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import { ResumeData } from '@/types/resume';
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { ResumeData } from "@/types/resume";
 
 interface DownloadedResume {
   id: string;
@@ -19,7 +18,7 @@ export const useDownloadedResumeOperations = () => {
     title: string,
     templateId: string,
     userId?: string,
-    downloadedResumeId?: string
+    downloadedResumeId?: string,
   ) => {
     if (!userId) return null;
 
@@ -36,61 +35,70 @@ export const useDownloadedResumeOperations = () => {
       if (downloadedResumeId) {
         // Update existing downloaded resume
         ({ data, error } = await supabase
-          .from('downloaded_resumes')
+          .from("downloaded_resumes")
           .update(payload)
-          .eq('id', downloadedResumeId)
+          .eq("id", downloadedResumeId)
           .select()
           .single());
       } else {
         // Insert new downloaded resume
         ({ data, error } = await supabase
-          .from('downloaded_resumes')
+          .from("downloaded_resumes")
           .insert(payload)
           .select()
           .single());
       }
-      
+
       if (error) throw error;
 
       return data;
     } catch (error) {
-      console.error('Error saving downloaded resume:', error);
+      console.error("Error saving downloaded resume:", error);
       return null;
     }
   };
 
   const deleteDownloadedResume = async (resumeId: string, userId?: string) => {
-    if (!userId) return;
-
     try {
-      const { error } = await supabase
-        .from('downloaded_resumes')
-        .delete()
-        .eq('id', resumeId);
+      if (!userId) {
+        throw new Error("User not authenticated");
+      }
 
-      if (error) throw error;
+      // Delete the resume from the database
+      const { error } = await supabase
+        .from("downloaded_resumes")
+        .delete()
+        .eq("id", resumeId)
+        .eq("user_id", userId);
+
+      if (error) {
+        console.error("Error deleting downloaded resume:", error);
+        throw new Error("Failed to delete downloaded resume");
+      }
 
       toast({
         title: "Success",
         description: "Downloaded resume deleted successfully",
       });
     } catch (error) {
-      console.error('Error deleting downloaded resume:', error);
+      console.error("Error in deleteDownloadedResume:", error);
       toast({
         title: "Error",
-        description: "Failed to delete downloaded resume",
+        description: "Failed to delete downloaded resume. Please try again.",
         variant: "destructive",
       });
     }
   };
 
-  const loadDownloadedResumeForEditing = (downloadedResume: DownloadedResume) => {
+  const loadDownloadedResumeForEditing = (
+    downloadedResume: DownloadedResume,
+  ) => {
     return {
       resumeData: downloadedResume.resume_data,
       title: downloadedResume.title,
       templateId: downloadedResume.template_id,
       isFromDownloaded: true,
-      downloadedResumeId: downloadedResume.id
+      downloadedResumeId: downloadedResume.id,
     };
   };
 

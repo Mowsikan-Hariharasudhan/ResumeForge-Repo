@@ -31,6 +31,9 @@ import {
 } from "@/components/ui/dialog";
 import { TemplateRenderer } from "@/components/TemplateRenderer";
 import { getTemplateById } from "@/types/templates";
+import { toast } from "@/components/ui/use-toast";
+import { TemplateCard } from "@/components/TemplateCard";
+import { ensureResumeDataCompatibility } from '@/utils/resumeDataUtils';
 
 const DownloadedResumes = () => {
   const { user } = useAuth();
@@ -85,12 +88,34 @@ const DownloadedResumes = () => {
   };
 
   const handleDelete = async (resumeId: string) => {
+    console.log("Delete button clicked for downloaded resume:", resumeId);
+    console.log("Current user:", user);
     if (
       window.confirm(
         "Are you sure you want to delete this downloaded resume? This will remove it from your download history.",
       )
     ) {
-      await deleteDownloadedResume(resumeId);
+      try {
+        console.log(
+          "User confirmed deletion, calling deleteDownloadedResume...",
+        );
+        await deleteDownloadedResume(resumeId);
+        console.log("Delete operation completed");
+        toast({
+          title: "Success",
+          description: "Resume deleted successfully",
+          variant: "default",
+        });
+      } catch (error) {
+        console.error("Delete operation failed:", error);
+        toast({
+          title: "Error",
+          description: "Failed to delete resume. Please try again.",
+          variant: "destructive",
+        });
+      }
+    } else {
+      console.log("User cancelled deletion");
     }
   };
 
@@ -356,7 +381,7 @@ const DownloadedResumes = () => {
                   new Date(resume.downloaded_at).getTime()) /
                   (1000 * 60 * 60) <
                 24;
-
+              const safeResumeData = ensureResumeDataCompatibility(resume.resume_data);
               return (
                 <div key={resume.id} className="group cursor-pointer">
                   {/* Resume Preview Card */}
@@ -370,7 +395,7 @@ const DownloadedResumes = () => {
                                 templateId={
                                   resume.template_id || "modern-classic"
                                 }
-                                resumeData={resume.resume_data}
+                                resumeData={safeResumeData}
                               />
                             </div>
                           </div>
@@ -379,17 +404,6 @@ const DownloadedResumes = () => {
                         {/* Hover Overlay */}
                         <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300 flex items-center justify-center">
                           <div className="opacity-0 group-hover:opacity-100 transition-all duration-300 flex gap-2">
-                            <Button
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handlePreview(resume);
-                              }}
-                              className="bg-white text-gray-900 hover:bg-gray-100 shadow-lg"
-                            >
-                              <Eye className="w-4 h-4 mr-1" />
-                              Preview
-                            </Button>
                             <Button
                               size="sm"
                               onClick={(e) => {
@@ -452,16 +466,6 @@ const DownloadedResumes = () => {
                           <div className="flex gap-1">
                             <Button
                               size="sm"
-                              variant="outline"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handlePreview(resume);
-                              }}
-                            >
-                              <Eye className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              size="sm"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleEdit(resume.id);
@@ -517,7 +521,7 @@ const DownloadedResumes = () => {
               <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
                 <TemplateRenderer
                   templateId={selectedResume.template_id || "modern-classic"}
-                  resumeData={selectedResume.resume_data}
+                  resumeData={ensureResumeDataCompatibility(selectedResume.resume_data)}
                 />
               </div>
             )}

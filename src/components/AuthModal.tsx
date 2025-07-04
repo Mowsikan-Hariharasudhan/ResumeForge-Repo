@@ -116,7 +116,7 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
         <div className="bg-gradient-primary text-white p-6 pb-4">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold text-center text-white">
-              Welcome to ResumeForge
+              Welcome to Resumify
             </DialogTitle>
             <p className="text-blue-100 text-center text-sm mt-2">
               Create professional resumes in minutes

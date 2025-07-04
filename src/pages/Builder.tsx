@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,7 +11,7 @@ import { ResumeEditLoader } from "@/components/ResumeEditLoader";
 import { PricingModal } from "@/components/PricingModal";
 import { AuthModal } from "@/components/AuthModal";
 import { TemplateSelector } from "@/components/TemplateSelector";
-import { TemplateRenderer } from "@/components/TemplateRenderer";
+import { ResumePreview } from "@/components/ResumePreview";
 import { useResumes } from "@/hooks/useResumes";
 import { useAuth } from "@/hooks/useAuth";
 import { usePurchases } from "@/hooks/usePurchases";
@@ -44,6 +44,7 @@ import {
 } from "@/components/ui/resizable";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import { ResumeFieldVisibility } from '@/components/ResumePreview';
 
 // Dummy data for initial preview
 const dummyResumeData: ResumeData = {
@@ -154,6 +155,26 @@ const Builder = () => {
   const [zoom, setZoom] = useState(1.0);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
+  // Add state for visible fields (all true by default)
+  const defaultVisibleFields = {
+    fullName: true,
+    email: true,
+    phone: true,
+    location: true,
+    website: true,
+    linkedin: true,
+    github: true,
+    summary: true,
+    achievements: true,
+    experience: true,
+    education: true,
+    skills: true,
+    languages: true,
+    certifications: true,
+    projects: true,
+  };
+  const [visibleFields, setVisibleFields] = useState<Record<string, boolean>>(defaultVisibleFields);
+
   // Calculate total downloads remaining
   const totalDownloadsRemaining = purchases.reduce((total, purchase) => {
     const isNotExpired =
@@ -197,16 +218,17 @@ const Builder = () => {
     }
   }, [searchParams]);
 
-  const handleLoadResume = (data: any) => {
-    setResumeData(data.resumeData);
-    setResumeTitle(data.title);
+  const handleLoadResume = useCallback((data: any) => {
+    // Ensure we're updating state properly with spread to trigger re-renders
+    setResumeData((prev) => ({ ...prev, ...data.resumeData }));
+    setResumeTitle(data.title || "My Professional Resume");
     if (data.templateId && getTemplateById(data.templateId)) {
       setCurrentTemplate(data.templateId);
     }
     setResumeId(data.resumeId || null);
     setDownloadedResumeId(data.downloadedResumeId || null);
     setIsFromDownloaded(data.isFromDownloaded || false);
-  };
+  }, []);
 
   const handleSave = async () => {
     if (!user) {
@@ -306,6 +328,14 @@ const Builder = () => {
           throw new Error("Preview not available");
         }
 
+        // Hide watermarks temporarily
+        const watermarkElements = previewRef.current.querySelectorAll(
+          ".absolute.inset-0.pointer-events-none, .absolute.top-1\\/4, .absolute.bottom-1\\/4",
+        );
+        watermarkElements.forEach((element) => {
+          (element as HTMLElement).style.display = "none";
+        });
+
         // Configure PDF options for high quality
         const options = {
           margin: 0,
@@ -327,6 +357,11 @@ const Builder = () => {
 
         // Generate and download PDF
         await html2pdf().from(previewRef.current).set(options).save();
+
+        // Restore watermarks
+        watermarkElements.forEach((element) => {
+          (element as HTMLElement).style.display = "";
+        });
 
         // Consume download credit
         const consumed = await consumeDownload();
@@ -587,12 +622,11 @@ const Builder = () => {
 
                   {/* Form Tabs */}
                   <Tabs defaultValue="personal" className="w-full">
-                    <TabsList className="grid w-full grid-cols-5">
+                    <TabsList className="w-full grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2">
                       <TabsTrigger value="personal">Personal</TabsTrigger>
                       <TabsTrigger value="experience">Experience</TabsTrigger>
                       <TabsTrigger value="education">Education</TabsTrigger>
                       <TabsTrigger value="skills">Skills</TabsTrigger>
-                      <TabsTrigger value="additional">Additional</TabsTrigger>
                     </TabsList>
 
                     {/* Personal Information */}
@@ -603,12 +637,13 @@ const Builder = () => {
                           <Input
                             id="fullName"
                             value={resumeData.fullName}
-                            onChange={(e) =>
+                            onChange={(e) => {
+                              const value = e.target.value;
                               setResumeData((prev) => ({
                                 ...prev,
-                                fullName: e.target.value,
-                              }))
-                            }
+                                fullName: value,
+                              }));
+                            }}
                             placeholder="John Doe"
                           />
                         </div>
@@ -618,12 +653,13 @@ const Builder = () => {
                             id="email"
                             type="email"
                             value={resumeData.email}
-                            onChange={(e) =>
+                            onChange={(e) => {
+                              const value = e.target.value;
                               setResumeData((prev) => ({
                                 ...prev,
-                                email: e.target.value,
-                              }))
-                            }
+                                email: value,
+                              }));
+                            }}
                             placeholder="john@example.com"
                           />
                         </div>
@@ -632,12 +668,13 @@ const Builder = () => {
                           <Input
                             id="phone"
                             value={resumeData.phone}
-                            onChange={(e) =>
+                            onChange={(e) => {
+                              const value = e.target.value;
                               setResumeData((prev) => ({
                                 ...prev,
-                                phone: e.target.value,
-                              }))
-                            }
+                                phone: value,
+                              }));
+                            }}
                             placeholder="+1 (555) 123-4567"
                           />
                         </div>
@@ -646,12 +683,13 @@ const Builder = () => {
                           <Input
                             id="location"
                             value={resumeData.location}
-                            onChange={(e) =>
+                            onChange={(e) => {
+                              const value = e.target.value;
                               setResumeData((prev) => ({
                                 ...prev,
-                                location: e.target.value,
-                              }))
-                            }
+                                location: value,
+                              }));
+                            }}
                             placeholder="New York, NY"
                           />
                         </div>
@@ -660,12 +698,13 @@ const Builder = () => {
                           <Input
                             id="website"
                             value={resumeData.website}
-                            onChange={(e) =>
+                            onChange={(e) => {
+                              const value = e.target.value;
                               setResumeData((prev) => ({
                                 ...prev,
-                                website: e.target.value,
-                              }))
-                            }
+                                website: value,
+                              }));
+                            }}
                             placeholder="https://johndoe.com"
                           />
                         </div>
@@ -674,12 +713,13 @@ const Builder = () => {
                           <Input
                             id="linkedin"
                             value={resumeData.linkedin}
-                            onChange={(e) =>
+                            onChange={(e) => {
+                              const value = e.target.value;
                               setResumeData((prev) => ({
                                 ...prev,
-                                linkedin: e.target.value,
-                              }))
-                            }
+                                linkedin: value,
+                              }));
+                            }}
                             placeholder="https://linkedin.com/in/johndoe"
                           />
                         </div>
@@ -690,12 +730,13 @@ const Builder = () => {
                         <Textarea
                           id="summary"
                           value={resumeData.summary}
-                          onChange={(e) =>
+                          onChange={(e) => {
+                            const value = e.target.value;
                             setResumeData((prev) => ({
                               ...prev,
-                              summary: e.target.value,
-                            }))
-                          }
+                              summary: value,
+                            }));
+                          }}
                           placeholder="Brief overview of your professional background and key achievements..."
                           rows={4}
                         />
@@ -707,6 +748,9 @@ const Builder = () => {
                           setResumeData((prev) => ({ ...prev, achievements }))
                         }
                       />
+
+                      {/* Field Visibility Controls */}
+                      <ResumeFieldVisibility visibleFields={visibleFields} onChange={setVisibleFields} />
                     </TabsContent>
 
                     {/* Experience */}
@@ -1169,7 +1213,7 @@ const Builder = () => {
                         {/* Watermark Overlay */}
                         <div className="absolute inset-0 pointer-events-none z-50 flex items-center justify-center">
                           <div
-                            className="text-gray-200 text-6xl font-bold transform rotate-45 opacity-20 select-none"
+                            className="text-gray-200 text-6xl font-bold transform rotate-45 opacity-30 select-none"
                             style={{
                               textShadow: "2px 2px 4px rgba(0,0,0,0.1)",
                               userSelect: "none",
@@ -1184,20 +1228,23 @@ const Builder = () => {
 
                         {/* Multiple watermarks for better coverage */}
                         <div className="absolute top-1/4 left-1/4 pointer-events-none z-40">
-                          <div className="text-gray-100 text-3xl font-bold transform rotate-45 opacity-15 select-none">
-                            ResumeForge
+                          <div className="text-gray-100 text-3xl font-bold transform rotate-45 opacity-25 select-none">
+                            Resumify
                           </div>
                         </div>
                         <div className="absolute bottom-1/4 right-1/4 pointer-events-none z-40">
-                          <div className="text-gray-100 text-3xl font-bold transform rotate-45 opacity-15 select-none">
-                            ResumeForge
+                          <div className="text-gray-100 text-3xl font-bold transform rotate-45 opacity-25 select-none">
+                            Resumify
                           </div>
                         </div>
 
-                        <TemplateRenderer
-                          templateId={currentTemplate}
-                          resumeData={resumeData}
-                        />
+                        <div className="resume-template-content">
+                          <ResumePreview
+                            data={resumeData}
+                            template={currentTemplate}
+                            visibleFields={visibleFields}
+                          />
+                        </div>
                       </div>
                     </div>
                   </CardContent>

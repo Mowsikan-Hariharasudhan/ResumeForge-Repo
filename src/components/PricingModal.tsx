@@ -106,9 +106,9 @@ export const PricingModal = ({ isOpen, onClose }: PricingModalProps) => {
         key: 'rzp_live_RbZjUu8cORJ4Pw',
         amount: orderData.amount,
         currency: orderData.currency,
-        name: 'ResumeForge',
+        name: 'Resumify',
         description: selectedPlan.description,
-        image: '/logo.png',
+        image: '/LOGO-RESUMIFY.png',
         order_id: orderData.order_id,
         handler: async function (response: any) {
           try {

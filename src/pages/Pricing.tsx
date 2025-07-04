@@ -61,7 +61,7 @@ const Pricing = () => {
             Ready to Get Started?
           </h2>
           <p className="text-xl text-blue-100 mb-8">
-            Join thousands of professionals who've upgraded their careers with ResumeForge
+            Join thousands of professionals who've upgraded their careers with Resumify
           </p>
           <a href="/builder">
             <button className="bg-white text-blue-600 hover:bg-gray-50 text-lg px-8 py-3 rounded-lg font-medium transition-colors">

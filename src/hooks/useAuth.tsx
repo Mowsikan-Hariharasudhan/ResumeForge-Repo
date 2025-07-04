@@ -120,7 +120,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUser(data.user);
         
         toast({
-          title: "Welcome to ResumeForge!",
+          title: "Welcome to Resumify!",
           description: "Your account has been created successfully. You can now start building your resume.",
         });
       } else {

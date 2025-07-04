@@ -226,7 +226,7 @@ const Index = () => {
                     <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
                     <div className="w-3 h-3 bg-green-400 rounded-full"></div>
                     <span className="ml-4 text-sm text-gray-600 font-medium">
-                      ResumeForge Builder
+                      Resumify Builder
                     </span>
                   </div>
                 </div>
@@ -499,3 +499,6 @@ const Index = () => {
 };
 
 export default Index;
+
+// If you display template cards on the Index page, ensure TemplateCard is used with the latest props and visual style, e.g.:
+// <TemplateCard template={template} onUse={...} className="border-2 border-transparent group-hover:border-blue-400 transition-all duration-300" />

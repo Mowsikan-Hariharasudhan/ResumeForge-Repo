@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/dialog";
 import { TemplateRenderer } from "@/components/TemplateRenderer";
 import { getTemplateById } from "@/types/templates";
+import { TemplateCard } from "@/components/TemplateCard";
 
 const SavedResumes = () => {
   const { user } = useAuth();
@@ -85,12 +86,22 @@ const SavedResumes = () => {
   };
 
   const handleDelete = async (resumeId: string) => {
+    console.log("Delete button clicked for resume:", resumeId);
+
     if (
       window.confirm(
         "Are you sure you want to delete this resume? This action cannot be undone.",
       )
     ) {
-      await deleteResume(resumeId);
+      try {
+        console.log("User confirmed deletion, calling deleteResume...");
+        await deleteResume(resumeId);
+        console.log("Delete operation completed");
+      } catch (error) {
+        console.error("Delete operation failed:", error);
+      }
+    } else {
+      console.log("User cancelled deletion");
     }
   };
 
@@ -342,131 +353,20 @@ const SavedResumes = () => {
                 : "grid-cols-1 gap-4"
             }`}
           >
-            {filteredResumes.map((resume) => {
-              const template = getTemplateById(
-                resume.template_id || "modern-classic",
-              );
-              const isRecent =
-                (new Date().getTime() - new Date(resume.updated_at).getTime()) /
-                  (1000 * 60 * 60) <
-                24;
-
-              return (
-                <div key={resume.id} className="group cursor-pointer">
-                  {/* Resume Preview Card */}
-                  <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] bg-white">
-                    <CardContent className="p-0">
-                      <div className="aspect-[3/4] relative overflow-hidden bg-white">
-                        <div className="absolute inset-0 p-2">
-                          <div className="w-full h-full transform scale-[0.85] origin-top-left">
-                            <div className="w-[117%] h-[117%] bg-white shadow-sm rounded border border-gray-100">
-                              <TemplateRenderer
-                                templateId={
-                                  resume.template_id || "modern-classic"
-                                }
-                                resumeData={resume.resume_data}
-                              />
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Hover Overlay */}
-                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300 flex items-center justify-center">
-                          <div className="opacity-0 group-hover:opacity-100 transition-all duration-300 flex gap-2">
-                            <Button
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handlePreview(resume);
-                              }}
-                              className="bg-white text-gray-900 hover:bg-gray-100 shadow-lg"
-                            >
-                              <Eye className="w-4 h-4 mr-1" />
-                              Preview
-                            </Button>
-                            <Button
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleEdit(resume.id);
-                              }}
-                              className="bg-blue-600 text-white hover:bg-blue-700 shadow-lg"
-                            >
-                              <Edit className="w-4 h-4 mr-1" />
-                              Edit
-                            </Button>
-                          </div>
-                        </div>
-
-                        {/* Status Badges */}
-                        <div className="absolute top-2 right-2 flex flex-col gap-1">
-                          {isRecent && (
-                            <Badge className="bg-green-500 text-white text-xs shadow-sm">
-                              <Clock className="w-3 h-3 mr-1" />
-                              Recent
-                            </Badge>
-                          )}
-                        </div>
-
-                        {/* Delete Button */}
-                        <div className="absolute top-2 left-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDelete(resume.id);
-                            }}
-                            className="text-red-500 hover:text-red-700 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-opacity bg-white/80 backdrop-blur-sm"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </div>
-
-                      {/* Resume Info */}
-                      <div className="p-4 border-t border-gray-100">
-                        <h3 className="font-semibold text-gray-900 text-lg mb-2 truncate">
-                          {resume.title || "Untitled Resume"}
-                        </h3>
-                        <div className="flex items-center justify-between text-sm text-gray-500 mb-3">
-                          <div className="flex items-center">
-                            <Calendar className="w-4 h-4 mr-1" />
-                            {formatDate(resume.updated_at)}
-                          </div>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <Badge variant="secondary" className="text-xs">
-                            {template?.name || "Modern Classic"}
-                          </Badge>
-                          <div className="flex gap-1">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handlePreview(resume);
-                              }}
-                            >
-                              <Eye className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleEdit(resume.id);
-                              }}
-                            >
-                              <Edit className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              );
-            })}
+            {filteredResumes.map((resume) => (
+              <TemplateCard
+                key={resume.id}
+                template={getTemplateById(resume.template_id)}
+                onUse={() => handleEdit(resume.id)}
+                isSelected={false}
+                resumeData={resume.resume_data}
+                className={
+                  viewMode === "list"
+                    ? "md:flex-row border-2 border-transparent group-hover:border-blue-400 transition-all duration-300"
+                    : "border-2 border-transparent group-hover:border-blue-400 transition-all duration-300"
+                }
+              />
+            ))}
           </div>
         )}
       </div>
