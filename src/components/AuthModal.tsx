@@ -111,31 +111,30 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
         resetForm();
       }
     }}>
-      <DialogContent className="sm:max-w-md p-0 overflow-hidden">
+      <DialogContent className="w-full max-w-[95vw] sm:max-w-md p-0 overflow-hidden rounded-lg mx-2 sm:mx-0">
         {/* Header with gradient */}
-        <div className="bg-gradient-primary text-white p-6 pb-4">
+        <div className="bg-gradient-primary text-white p-4 sm:p-6 pb-3 sm:pb-4">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-center text-white">
+            <DialogTitle className="text-xl sm:text-2xl font-bold text-center text-white">
               Welcome to Resumify
             </DialogTitle>
-            <p className="text-blue-100 text-center text-sm mt-2">
+            <p className="text-blue-100 text-center text-xs sm:text-sm mt-1 sm:mt-2">
               Create professional resumes in minutes
             </p>
           </DialogHeader>
         </div>
-        
-        <div className="p-6">
+        <div className="p-4 sm:p-6 max-h-[80vh] overflow-y-auto mobile-scroll">
           <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-6 bg-gray-100">
+            <TabsList className="grid w-full grid-cols-2 mb-4 sm:mb-6 bg-gray-100 h-10 sm:h-11">
               <TabsTrigger 
                 value="signin" 
-                className="data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm"
+                className="data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm text-xs sm:text-sm py-2 font-medium"
               >
                 Sign In
               </TabsTrigger>
               <TabsTrigger 
                 value="signup"
-                className="data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm"
+                className="data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm text-xs sm:text-sm py-2 font-medium"
               >
                 Sign Up
               </TabsTrigger>
@@ -156,7 +155,7 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
             <TabsContent value="signin" className="space-y-4 mt-0">
               <form onSubmit={handleSignIn} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="signin-email" className="text-gray-700 font-medium">
+                  <Label htmlFor="signin-email" className="text-gray-700 font-medium text-xs sm:text-sm">
                     Email Address
                   </Label>
                   <div className="relative">
@@ -167,7 +166,7 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="Enter your email"
-                      className={`pl-10 h-11 ${errors.email ? 'border-red-300 focus:border-red-500' : 'border-gray-300 focus:border-blue-500'}`}
+                      className={`pl-10 h-10 sm:h-11 text-sm sm:text-base ${errors.email ? 'border-red-300 focus:border-red-500' : 'border-gray-300 focus:border-blue-500'}`}
                       required
                     />
                   </div>
@@ -178,9 +177,8 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                     </p>
                   )}
                 </div>
-                
                 <div className="space-y-2">
-                  <Label htmlFor="signin-password" className="text-gray-700 font-medium">
+                  <Label htmlFor="signin-password" className="text-gray-700 font-medium text-xs sm:text-sm">
                     Password
                   </Label>
                   <div className="relative">
@@ -191,7 +189,7 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Enter your password"
-                      className={`pl-10 pr-10 h-11 ${errors.password ? 'border-red-300 focus:border-red-500' : 'border-gray-300 focus:border-blue-500'}`}
+                      className={`pl-10 pr-10 h-10 sm:h-11 text-sm sm:text-base ${errors.password ? 'border-red-300 focus:border-red-500' : 'border-gray-300 focus:border-blue-500'}`}
                       required
                     />
                     <Button
@@ -211,10 +209,9 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                     </p>
                   )}
                 </div>
-                
                 <Button 
                   type="submit" 
-                  className="w-full h-11 bg-gradient-primary hover:opacity-90 text-white font-medium" 
+                  className="w-full h-10 sm:h-11 bg-gradient-primary hover:opacity-90 text-white font-medium text-sm sm:text-base" 
                   disabled={isLoading}
                 >
                   {isLoading ? (
@@ -232,7 +229,7 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
             <TabsContent value="signup" className="space-y-4 mt-0">
               <form onSubmit={handleSignUp} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="signup-name" className="text-gray-700 font-medium">
+                  <Label htmlFor="signup-name" className="text-gray-700 font-medium text-xs sm:text-sm">
                     Full Name
                   </Label>
                   <div className="relative">
@@ -243,7 +240,7 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
                       placeholder="Enter your full name"
-                      className={`pl-10 h-11 ${errors.fullName ? 'border-red-300 focus:border-red-500' : 'border-gray-300 focus:border-blue-500'}`}
+                      className={`pl-10 h-10 sm:h-11 text-sm sm:text-base ${errors.fullName ? 'border-red-300 focus:border-red-500' : 'border-gray-300 focus:border-blue-500'}`}
                       required
                     />
                   </div>
@@ -254,9 +251,8 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                     </p>
                   )}
                 </div>
-                
                 <div className="space-y-2">
-                  <Label htmlFor="signup-email" className="text-gray-700 font-medium">
+                  <Label htmlFor="signup-email" className="text-gray-700 font-medium text-xs sm:text-sm">
                     Email Address
                   </Label>
                   <div className="relative">
@@ -267,7 +263,7 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="Enter your email"
-                      className={`pl-10 h-11 ${errors.email ? 'border-red-300 focus:border-red-500' : 'border-gray-300 focus:border-blue-500'}`}
+                      className={`pl-10 h-10 sm:h-11 text-sm sm:text-base ${errors.email ? 'border-red-300 focus:border-red-500' : 'border-gray-300 focus:border-blue-500'}`}
                       required
                     />
                   </div>
@@ -278,9 +274,8 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                     </p>
                   )}
                 </div>
-                
                 <div className="space-y-2">
-                  <Label htmlFor="signup-password" className="text-gray-700 font-medium">
+                  <Label htmlFor="signup-password" className="text-gray-700 font-medium text-xs sm:text-sm">
                     Password
                   </Label>
                   <div className="relative">
@@ -291,7 +286,7 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Create a password (min. 6 characters)"
-                      className={`pl-10 pr-10 h-11 ${errors.password ? 'border-red-300 focus:border-red-500' : 'border-gray-300 focus:border-blue-500'}`}
+                      className={`pl-10 pr-10 h-10 sm:h-11 text-sm sm:text-base ${errors.password ? 'border-red-300 focus:border-red-500' : 'border-gray-300 focus:border-blue-500'}`}
                       required
                       minLength={6}
                     />
@@ -327,10 +322,9 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                     </div>
                   )}
                 </div>
-                
                 <Button 
                   type="submit" 
-                  className="w-full h-11 bg-gradient-primary hover:opacity-90 text-white font-medium" 
+                  className="w-full h-10 sm:h-11 bg-gradient-primary hover:opacity-90 text-white font-medium text-sm sm:text-base" 
                   disabled={isLoading}
                 >
                   {isLoading ? (
@@ -347,8 +341,8 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
           </Tabs>
           
           {/* Footer */}
-          <div className="mt-6 pt-4 border-t border-gray-200">
-            <p className="text-xs text-gray-500 text-center">
+          <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-gray-200">
+            <p className="text-[10px] sm:text-xs text-gray-500 text-center">
               By signing up, you agree to our{' '}
               <a href="#" className="text-blue-600 hover:underline">Terms of Service</a>
               {' '}and{' '}

@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Save, Download, Palette } from "lucide-react";
 import { getTemplateById } from "@/types/templates";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface ResumeActionsProps {
   currentTemplate: string;
@@ -26,9 +27,10 @@ export const ResumeActions = ({
   onTitleChange,
 }: ResumeActionsProps) => {
   const currentTemplateData = getTemplateById(currentTemplate);
+  const isMobile = useIsMobile();
 
   return (
-    <div className="space-y-4">
+    <div className={`space-y-4 ${isMobile ? 'p-4' : ''}`}>
       <div>
         <Label
           htmlFor="resume-title"
@@ -41,7 +43,7 @@ export const ResumeActions = ({
           type="text"
           value={title}
           onChange={(e) => onTitleChange(e.target.value)}
-          className="mt-1"
+          className={`mt-1 ${isMobile ? 'h-12' : ''}`}
           placeholder="Enter resume title"
         />
       </div>
@@ -51,7 +53,7 @@ export const ResumeActions = ({
         <Button
           onClick={onOpenTemplateSelector}
           variant="outline"
-          className="w-full mt-1 justify-start"
+          className={`w-full mt-1 justify-start ${isMobile ? 'h-12' : ''}`}
         >
           <Palette className="w-4 h-4 mr-2" />
           {currentTemplateData?.name || "Modern Classic"}
@@ -59,17 +61,21 @@ export const ResumeActions = ({
         </Button>
       </div>
 
-      <div className="flex gap-2">
+      <div className={`flex gap-2 ${isMobile ? 'flex-col' : ''}`}>
         <Button
           onClick={onSave}
           disabled={isSaving}
-          className="flex-1 bg-gradient-primary hover:opacity-90"
+          className={`${isMobile ? 'w-full h-12' : 'flex-1'} bg-gradient-primary hover:opacity-90`}
         >
           <Save className="w-4 h-4 mr-2" />
           {isSaving ? "Saving..." : "Save Resume"}
         </Button>
 
-        <Button onClick={onDownload} variant="outline" className="flex-1">
+        <Button 
+          onClick={onDownload} 
+          variant="outline" 
+          className={`${isMobile ? 'w-full h-12' : 'flex-1'}`}
+        >
           <Download className="w-4 h-4 mr-2" />
           Download PDF
         </Button>

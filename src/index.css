@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -144,5 +143,416 @@
 @layer utilities {
   .text-gradient {
     @apply bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent;
+  }
+  
+  /* Hide scrollbar for mobile tabs */
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* Internet Explorer 10+ */
+    scrollbar-width: none;  /* Firefox */
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;  /* Safari and Chrome */
+  }
+  
+  /* Mobile utility classes */
+  .mobile-safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  .mobile-safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+}
+
+/* Mobile optimizations for resume builder */
+@media (max-width: 768px) {
+  .resume-builder-mobile {
+    /* Ensure full viewport usage on mobile */
+    min-height: 100vh;
+    padding: 0;
+  }
+  
+  /* Mobile tab styling */
+  .mobile-tabs [data-state="active"] {
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    color: white;
+  }
+  
+  /* Mobile button height for better touch targets */
+  .mobile-button-height {
+    min-height: 44px;
+  }
+  
+  /* Mobile floating action buttons */
+  .mobile-fab {
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+  }
+  
+  .mobile-fab:hover {
+    transform: scale(1.05);
+  }
+  
+  .mobile-fab:active {
+    transform: scale(0.95);
+  }
+  
+  /* Floating button positioning */
+  .floating-button {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Mobile preview adjustments */
+  .mobile-preview {
+    transform: scale(0.5);
+    transform-origin: top left;
+    width: 200%;
+    height: 200%;
+  }
+  
+  /* Touch-friendly form elements */
+  .mobile-form input,
+  .mobile-form textarea,
+  .mobile-form button {
+    min-height: 44px; /* iOS recommended touch target */
+  }
+  
+  /* Improve mobile form spacing */
+  .mobile-form .space-y-4 > * + * {
+    margin-top: 1.5rem;
+  }
+  
+  /* Mobile-specific card styling */
+  .mobile-card {
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Mobile header improvements */
+  .mobile-header {
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.95);
+  }
+  
+  /* Mobile-optimized tabs */
+  .mobile-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .mobile-tabs::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Mobile keyboard optimizations */
+  .mobile-input-focus {
+    transform: translateY(-10px);
+    transition: transform 0.3s ease;
+  }
+  
+  /* Mobile swipe gestures support */
+  .mobile-swipe-enabled {
+    touch-action: pan-y;
+  }
+  
+  /* Mobile modal and dialog adjustments */
+  .mobile-modal {
+    max-width: 95vw;
+    max-height: 95vh;
+    margin: 0.5rem;
+  }
+  
+  .mobile-modal-content {
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  
+  /* Mobile template selector improvements */
+  .mobile-template-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  /* Mobile pricing modal improvements */
+  .mobile-pricing-card {
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .mobile-pricing-features {
+    font-size: 0.75rem;
+    line-height: 1.3;
+  }
+}
+  
+  /* Improve mobile scrolling */
+  @media (max-width: 768px) {
+    .mobile-scroll {
+      -webkit-overflow-scrolling: touch;
+      scroll-behavior: smooth;
+    }
+    
+    /* Mobile-specific scrollbar styling */
+    .mobile-scroll::-webkit-scrollbar {
+      width: 3px;
+    }
+    
+    .mobile-scroll::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    
+    .mobile-scroll::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 10px;
+    }
+    
+    /* Mobile pull-to-refresh prevention */
+    .mobile-no-pull-refresh {
+      overscroll-behavior: contain;
+    }
+    
+    /* Mobile haptic feedback simulation */
+    .mobile-haptic:active {
+      transform: scale(0.98);
+      transition: transform 0.1s ease;
+    }
+  }
+  
+  /* Landscape orientation adjustments */
+  @media (max-width: 768px) and (orientation: landscape) {
+    .mobile-landscape-adjust {
+      height: 100vh;
+      overflow-y: auto;
+    }
+    
+    .mobile-landscape-header {
+      height: 60px;
+    }
+  }
+  
+  /* High-DPI mobile display optimizations */
+  @media (max-width: 768px) and (-webkit-min-device-pixel-ratio: 2) {
+    .mobile-retina-text {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+  }
+
+  /* Mobile responsive templates */
+  @media (max-width: 768px) {
+    .mobile-template {
+      width: 100% !important;
+      max-width: 100% !important;
+      padding: 12px !important;
+      font-size: 11px !important;
+      line-height: 1.3 !important;
+      box-sizing: border-box !important;
+      overflow-wrap: break-word !important;
+      word-wrap: break-word !important;
+      min-height: auto !important;
+    }
+
+    .mobile-template .field-label {
+      font-size: 13px !important;
+      margin-bottom: 3px !important;
+      font-weight: 600 !important;
+    }
+
+    .mobile-template .field-content {
+      font-size: 11px !important;
+      line-height: 1.3 !important;
+      margin-bottom: 6px !important;
+    }
+
+    .mobile-template .section-title {
+      font-size: 15px !important;
+      margin-bottom: 6px !important;
+      font-weight: 700 !important;
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 2px !important;
+    }
+
+    .mobile-template .mobile-section {
+      margin-bottom: 12px !important;
+    }
+
+    .mobile-template .mobile-experience-item {
+      margin-bottom: 10px !important;
+      padding-bottom: 6px !important;
+      border-bottom: 1px solid #f3f4f6;
+    }
+
+    /* Ensure mobile templates fit properly */
+    .mobile-template * {
+      max-width: 100% !important;
+      word-break: break-word !important;
+    }
+
+    /* Mobile template grid adjustments */
+    .mobile-template .grid {
+      grid-template-columns: 1fr !important;
+      gap: 6px !important;
+    }
+
+    .mobile-template .flex {
+      flex-direction: column !important;
+      gap: 3px !important;
+    }
+
+    /* Force mobile layout for specific elements */
+    .mobile-template .md\:flex-row {
+      flex-direction: column !important;
+    }
+
+    .mobile-template .md\:w-1\/4,
+    .mobile-template .md\:w-3\/4 {
+      width: 100% !important;
+    }
+
+    /* Mobile-specific padding and margins */
+    .mobile-template h1 { font-size: 16px !important; margin-bottom: 4px !important; }
+    .mobile-template h2 { font-size: 14px !important; margin-bottom: 3px !important; }
+    .mobile-template h3 { font-size: 13px !important; margin-bottom: 2px !important; }
+    .mobile-template h4 { font-size: 12px !important; margin-bottom: 2px !important; }
+    .mobile-template p { font-size: 11px !important; margin-bottom: 4px !important; }
+    .mobile-template ul, .mobile-template ol { margin-left: 12px !important; }
+    .mobile-template li { font-size: 11px !important; margin-bottom: 2px !important; }
+  }
+
+/* Mobile-specific card improvements */
+.mobile-card-actions {
+  display: flex;
+  gap: 0.5rem;
+  opacity: 1;
+  transition: opacity 300ms;
+}
+
+.mobile-card-overlay {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0);
+  transition: all 300ms;
+}
+
+.mobile-card-overlay:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.mobile-touch-target {
+  min-height: 44px;
+  min-width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 768px) {
+  .mobile-responsive-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .mobile-card:hover {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    transform: scale(1.02);
+  }
+  
+  .mobile-action-button {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: 0.375rem;
+    transition: colors 200ms;
+  }
+  
+  .mobile-modal {
+    max-width: 95vw;
+    max-height: 95vh;
+    margin: 0.5rem;
+    padding: 1rem;
+  }
+  
+  .mobile-search-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    width: 100%;
+  }
+  
+  .mobile-filter-control {
+    flex: 1;
+    height: 2.75rem;
+  }
+}
+
+/* Desktop hover states */
+@media (min-width: 769px) {
+  .desktop-card-actions {
+    opacity: 0;
+    transition: opacity 300ms;
+  }
+  
+  .desktop-card-actions:hover {
+    opacity: 1;
+  }
+  
+  .desktop-card-overlay {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0);
+    transition: all 300ms;
+  }
+  
+  .desktop-card-overlay:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* Improved scrollbar styles */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Better mobile touch targets */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Mobile-first responsive grid utilities */
+.responsive-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .responsive-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .responsive-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .responsive-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
   }
 }

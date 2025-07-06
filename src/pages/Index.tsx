@@ -23,12 +23,13 @@ import {
   Globe,
   Heart,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { PricingSection } from "@/components/PricingSection";
 import { TemplateCard } from "@/components/TemplateCard";
 import { TEMPLATES } from "@/types/templates";
 
 const Index = () => {
+  const navigate = useNavigate();
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -48,13 +49,7 @@ const Index = () => {
         "All templates are designed to pass Applicant Tracking Systems and get you noticed by recruiters",
       color: "green",
     },
-    {
-      icon: <Download className="w-6 h-6" />,
-      title: "High-Quality PDF Export",
-      description:
-        "Download professional PDFs optimized for both digital applications and printing",
-      color: "purple",
-    },
+   
     {
       icon: <Clock className="w-6 h-6" />,
       title: "Quick Creation",
@@ -62,20 +57,8 @@ const Index = () => {
         "Build a professional resume in minutes, not hours. Our smart system guides you through each step",
       color: "orange",
     },
-    {
-      icon: <Shield className="w-6 h-6" />,
-      title: "Data Security",
-      description:
-        "Your personal information is encrypted and secure. We never share your data with third parties",
-      color: "red",
-    },
-    {
-      icon: <Globe className="w-6 h-6" />,
-      title: "Multiple Formats",
-      description:
-        "Choose from various international resume formats and industry-specific layouts",
-      color: "indigo",
-    },
+   
+   
   ];
 
   const testimonials = [
@@ -479,9 +462,9 @@ const Index = () => {
             </Link>
             <Link to="/templates">
               <Button
-                size="lg"
+                onClick={() => navigate("/templates")}
                 variant="outline"
-                className="border-2 border-white text-white hover:bg-white/10 text-lg px-8 py-4"
+                className="text-lg px-8 py-3 border-2"
               >
                 <Eye className="w-5 h-5 mr-2" />
                 Browse Templates

@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
@@ -13,12 +13,20 @@ import DownloadedResumes from "@/pages/DownloadedResumes";
 
 const queryClient = new QueryClient();
 
+// Component to conditionally render Navbar
+const ConditionalNavbar = () => {
+  const location = useLocation();
+  const hideNavbarPaths = ['/builder'];
+  
+  return !hideNavbarPaths.includes(location.pathname) ? <Navbar /> : null;
+};
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <div className="min-h-screen bg-background font-sans antialiased">
-          <Navbar />
+          <ConditionalNavbar />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/builder" element={<Builder />} />

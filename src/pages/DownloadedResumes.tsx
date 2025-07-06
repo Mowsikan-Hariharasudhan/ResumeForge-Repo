@@ -34,6 +34,7 @@ import { getTemplateById } from "@/types/templates";
 import { toast } from "@/components/ui/use-toast";
 import { TemplateCard } from "@/components/TemplateCard";
 import { ensureResumeDataCompatibility } from '@/utils/resumeDataUtils';
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const DownloadedResumes = () => {
   const { user } = useAuth();
@@ -47,24 +48,25 @@ const DownloadedResumes = () => {
     "recent",
   );
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const isMobile = useIsMobile();
 
   if (!user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-green-50 flex items-center justify-center">
-        <div className="text-center max-w-md mx-auto p-8">
-          <div className="w-24 h-24 bg-gradient-to-br from-green-500 to-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-6">
-            <Download className="w-12 h-12 text-white" />
+        <div className={`text-center max-w-md mx-auto ${isMobile ? 'p-4' : 'p-8'}`}>
+          <div className={`${isMobile ? 'w-20 h-20' : 'w-24 h-24'} bg-gradient-to-br from-green-500 to-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-6`}>
+            <Download className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} text-white`} />
           </div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+          <h2 className={`${isMobile ? 'text-2xl' : 'text-3xl'} font-bold text-gray-900 mb-4`}>
             Access Your Downloads
           </h2>
-          <p className="text-gray-600 mb-8 leading-relaxed">
+          <p className={`text-gray-600 mb-8 leading-relaxed ${isMobile ? 'text-sm' : ''}`}>
             Sign in to view and manage all your downloaded resume files. Keep
             track of your applications and download history.
           </p>
           <Button
             onClick={() => setShowAuthModal(true)}
-            className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-lg px-8 py-3"
+            className={`bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 ${isMobile ? 'text-base px-6 py-3 w-full' : 'text-lg px-8 py-3'}`}
           >
             <Sparkles className="w-5 h-5 mr-2" />
             Sign In to Continue
@@ -174,20 +176,20 @@ const DownloadedResumes = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-green-50">
       {/* Enhanced Header */}
       <div className="bg-white border-b border-gray-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex items-center justify-between">
+        <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ${isMobile ? 'py-6' : 'py-8'}`}>
+          <div className={`flex ${isMobile ? 'flex-col gap-4' : 'items-center justify-between'}`}>
             <div>
-              <h1 className="text-4xl font-bold text-gray-900 mb-2">
+              <h1 className={`${isMobile ? 'text-2xl' : 'text-4xl'} font-bold text-gray-900 mb-2`}>
                 Downloaded Resumes
               </h1>
-              <p className="text-gray-600 text-lg">
+              <p className={`text-gray-600 ${isMobile ? 'text-base' : 'text-lg'}`}>
                 Your download history • {downloadedResumes.length} resume
                 {downloadedResumes.length !== 1 ? "s" : ""} downloaded
               </p>
             </div>
             <Button
               onClick={() => navigate("/builder")}
-              className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 text-lg px-6 py-3"
+              className={`bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 ${isMobile ? 'text-base px-4 py-2.5 w-full' : 'text-lg px-6 py-3'}`}
             >
               <Plus className="w-5 h-5 mr-2" />
               Create New Resume
@@ -195,18 +197,18 @@ const DownloadedResumes = () => {
           </div>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+          <div className={`grid grid-cols-1 ${isMobile ? 'gap-4 mt-6' : 'md:grid-cols-3 gap-6 mt-8'}`}>
             <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
-              <CardContent className="p-6">
+              <CardContent className={`${isMobile ? 'p-4' : 'p-6'}`}>
                 <div className="flex items-center">
-                  <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center">
-                    <Download className="w-6 h-6 text-white" />
+                  <div className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} bg-green-500 rounded-xl flex items-center justify-center`}>
+                    <Download className={`${isMobile ? 'w-5 h-5' : 'w-6 h-6'} text-white`} />
                   </div>
                   <div className="ml-4">
-                    <p className="text-2xl font-bold text-gray-900">
+                    <p className={`${isMobile ? 'text-xl' : 'text-2xl'} font-bold text-gray-900`}>
                       {downloadedResumes.length}
                     </p>
-                    <p className="text-green-700 font-medium">
+                    <p className={`text-green-700 font-medium ${isMobile ? 'text-sm' : ''}`}>
                       Total Downloads
                     </p>
                   </div>
@@ -215,13 +217,13 @@ const DownloadedResumes = () => {
             </Card>
 
             <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
-              <CardContent className="p-6">
+              <CardContent className={`${isMobile ? 'p-4' : 'p-6'}`}>
                 <div className="flex items-center">
-                  <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center">
-                    <Clock className="w-6 h-6 text-white" />
+                  <div className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} bg-blue-500 rounded-xl flex items-center justify-center`}>
+                    <Clock className={`${isMobile ? 'w-5 h-5' : 'w-6 h-6'} text-white`} />
                   </div>
                   <div className="ml-4">
-                    <p className="text-2xl font-bold text-gray-900">
+                    <p className={`${isMobile ? 'text-xl' : 'text-2xl'} font-bold text-gray-900`}>
                       {
                         downloadedResumes.filter((r) => {
                           const hours =
@@ -232,26 +234,26 @@ const DownloadedResumes = () => {
                         }).length
                       }
                     </p>
-                    <p className="text-blue-700 font-medium">This Week</p>
+                    <p className={`text-blue-700 font-medium ${isMobile ? 'text-sm' : ''}`}>This Week</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
             <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
-              <CardContent className="p-6">
+              <CardContent className={`${isMobile ? 'p-4' : 'p-6'}`}>
                 <div className="flex items-center">
-                  <div className="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center">
-                    <Star className="w-6 h-6 text-white" />
+                  <div className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} bg-purple-500 rounded-xl flex items-center justify-center`}>
+                    <Star className={`${isMobile ? 'w-5 h-5' : 'w-6 h-6'} text-white`} />
                   </div>
                   <div className="ml-4">
-                    <p className="text-2xl font-bold text-gray-900">
+                    <p className={`${isMobile ? 'text-xl' : 'text-2xl'} font-bold text-gray-900`}>
                       {
                         new Set(downloadedResumes.map((r) => r.template_id))
                           .size
                       }
                     </p>
-                    <p className="text-purple-700 font-medium">
+                    <p className={`text-purple-700 font-medium ${isMobile ? 'text-sm' : ''}`}>
                       Unique Templates
                     </p>
                   </div>
@@ -263,38 +265,39 @@ const DownloadedResumes = () => {
       </div>
 
       {/* Enhanced Filter and Search Section */}
-      <div className="bg-white border-b border-gray-200 sticky top-16 z-40 backdrop-blur-md bg-white/90">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
+      <div className={`bg-white border-b border-gray-200 ${isMobile ? 'sticky top-0' : 'sticky top-16'} z-40 backdrop-blur-md bg-white/90`}>
+        <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ${isMobile ? 'py-3' : 'py-4'}`}>
+          <div className={`flex ${isMobile ? 'flex-col gap-3' : 'flex-col lg:flex-row gap-4'} items-center justify-between`}>
             {/* Search */}
-            <div className="relative flex-1 max-w-md">
+            <div className={`relative ${isMobile ? 'w-full order-1' : 'flex-1 max-w-md'}`}>
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
               <Input
-                placeholder="Search downloaded resumes..."
+                placeholder={isMobile ? "Search downloads..." : "Search downloaded resumes..."}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 border-2 border-gray-200 focus:border-green-500"
+                className={`pl-10 pr-4 border-2 border-gray-200 focus:border-green-500 ${isMobile ? 'h-11' : ''}`}
               />
             </div>
 
             {/* Sort and View Controls */}
-            <div className="flex items-center gap-4">
+            <div className={`flex items-center ${isMobile ? 'w-full justify-between order-2' : 'gap-4'}`}>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                className="px-3 py-2 border-2 border-gray-200 rounded-lg focus:border-green-500 bg-white"
+                className={`px-3 py-2 border-2 border-gray-200 rounded-lg focus:border-green-500 bg-white ${isMobile ? 'flex-1 mr-3 h-11' : ''}`}
               >
                 <option value="recent">Recently Downloaded</option>
                 <option value="name">Name A-Z</option>
                 <option value="template">Template Type</option>
               </select>
 
-              <div className="flex items-center bg-gray-100 rounded-lg p-1">
+              <div className={`flex items-center bg-gray-100 rounded-lg p-1 ${isMobile ? 'min-w-[80px]' : ''}`}>
                 <Button
                   variant={viewMode === "grid" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setViewMode("grid")}
-                  className="rounded-md"
+                  className={`rounded-md ${isMobile ? 'p-2' : ''}`}
+                  title="Grid View"
                 >
                   <Grid className="w-4 h-4" />
                 </Button>
@@ -302,7 +305,8 @@ const DownloadedResumes = () => {
                   variant={viewMode === "list" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setViewMode("list")}
-                  className="rounded-md"
+                  className={`rounded-md ${isMobile ? 'p-2' : ''}`}
+                  title="List View"
                 >
                   <List className="w-4 h-4" />
                 </Button>
@@ -310,7 +314,7 @@ const DownloadedResumes = () => {
             </div>
           </div>
 
-          <div className="mt-2 text-sm text-gray-600">
+          <div className={`mt-2 ${isMobile ? 'text-xs' : 'text-sm'} text-gray-600`}>
             Showing {filteredResumes.length} of {downloadedResumes.length}{" "}
             downloaded resumes
           </div>
@@ -318,23 +322,23 @@ const DownloadedResumes = () => {
       </div>
 
       {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ${isMobile ? 'py-6' : 'py-8'}`}>
         {downloadedResumes.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="w-32 h-32 bg-gradient-to-br from-gray-100 to-gray-200 rounded-3xl flex items-center justify-center mx-auto mb-8">
-              <Archive className="w-16 h-16 text-gray-400" />
+          <div className={`text-center ${isMobile ? 'py-12' : 'py-16'}`}>
+            <div className={`${isMobile ? 'w-24 h-24' : 'w-32 h-32'} bg-gradient-to-br from-gray-100 to-gray-200 rounded-3xl flex items-center justify-center mx-auto ${isMobile ? 'mb-6' : 'mb-8'}`}>
+              <Archive className={`${isMobile ? 'w-12 h-12' : 'w-16 h-16'} text-gray-400`} />
             </div>
-            <h3 className="text-2xl font-semibold text-gray-900 mb-4">
+            <h3 className={`${isMobile ? 'text-xl' : 'text-2xl'} font-semibold text-gray-900 mb-4`}>
               No Downloads Yet
             </h3>
-            <p className="text-gray-600 mb-8 max-w-md mx-auto leading-relaxed">
+            <p className={`text-gray-600 ${isMobile ? 'mb-6 text-sm' : 'mb-8'} max-w-md mx-auto leading-relaxed`}>
               Your downloaded resumes will appear here. Create and download your
               first professional resume to get started.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className={`flex ${isMobile ? 'flex-col gap-3' : 'flex-col sm:flex-row gap-4'} justify-center`}>
               <Button
                 onClick={() => navigate("/builder")}
-                className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-lg px-8 py-3"
+                className={`bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 ${isMobile ? 'text-base px-6 py-3' : 'text-lg px-8 py-3'}`}
               >
                 <Plus className="w-5 h-5 mr-2" />
                 Create & Download Resume
@@ -342,7 +346,7 @@ const DownloadedResumes = () => {
               <Button
                 onClick={() => navigate("/templates")}
                 variant="outline"
-                className="text-lg px-8 py-3 border-2"
+                className={`border-2 ${isMobile ? 'text-base px-6 py-3' : 'text-lg px-8 py-3'}`}
               >
                 <Eye className="w-5 h-5 mr-2" />
                 Browse Templates
@@ -350,14 +354,14 @@ const DownloadedResumes = () => {
             </div>
           </div>
         ) : filteredResumes.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Search className="w-12 h-12 text-gray-400" />
+          <div className={`text-center ${isMobile ? 'py-12' : 'py-16'}`}>
+            <div className={`${isMobile ? 'w-20 h-20' : 'w-24 h-24'} bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6`}>
+              <Search className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} text-gray-400`} />
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            <h3 className={`${isMobile ? 'text-lg' : 'text-xl'} font-semibold text-gray-900 mb-2`}>
               No downloads found
             </h3>
-            <p className="text-gray-600 mb-6">
+            <p className={`text-gray-600 mb-6 ${isMobile ? 'text-sm' : ''}`}>
               Try adjusting your search terms
             </p>
             <Button onClick={() => setSearchTerm("")} variant="outline">
@@ -368,8 +372,10 @@ const DownloadedResumes = () => {
           <div
             className={`grid ${
               viewMode === "grid"
-                ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
-                : "grid-cols-1 gap-4"
+                ? isMobile 
+                  ? "grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8"
+                  : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
+                : "grid-cols-1 gap-6"
             }`}
           >
             {filteredResumes.map((resume) => {
@@ -385,9 +391,9 @@ const DownloadedResumes = () => {
               return (
                 <div key={resume.id} className="group cursor-pointer">
                   {/* Resume Preview Card */}
-                  <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] bg-white">
+                  <Card className={`overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] bg-white ${isMobile ? 'shadow-md' : 'shadow-lg'}`}>
                     <CardContent className="p-0">
-                      <div className="aspect-[3/4] relative overflow-hidden bg-white">
+                      <div className={`${isMobile ? 'aspect-[4/5]' : 'aspect-[3/4]'} relative overflow-hidden bg-white`}>
                         <div className="absolute inset-0 p-2">
                           <div className="w-full h-full transform scale-[0.85] origin-top-left">
                             <div className="w-[117%] h-[117%] bg-white shadow-sm rounded border border-gray-100">
@@ -415,66 +421,130 @@ const DownloadedResumes = () => {
                               <Edit className="w-4 h-4 mr-1" />
                               Edit
                             </Button>
+                            <Button
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handlePreview(resume);
+                              }}
+                              className="bg-gray-600 text-white hover:bg-gray-700 shadow-lg"
+                            >
+                              <Eye className="w-4 h-4 mr-1" />
+                              Preview
+                            </Button>
                           </div>
                         </div>
 
                         {/* Status Badges */}
                         <div className="absolute top-2 right-2 flex flex-col gap-1">
-                          <Badge className="bg-green-500 text-white text-xs shadow-sm">
+                          <Badge className={`bg-green-500 text-white shadow-sm ${isMobile ? 'text-xs px-2 py-1' : 'text-xs'}`}>
                             <Download className="w-3 h-3 mr-1" />
-                            Downloaded
+                            {isMobile ? "PDF" : "Downloaded"}
                           </Badge>
                           {isRecent && (
-                            <Badge className="bg-blue-500 text-white text-xs shadow-sm">
+                            <Badge className={`bg-blue-500 text-white shadow-sm ${isMobile ? 'text-xs px-2 py-1' : 'text-xs'}`}>
                               <Clock className="w-3 h-3 mr-1" />
-                              Recent
+                              {isMobile ? "New" : "Recent"}
                             </Badge>
                           )}
                         </div>
 
-                        {/* Delete Button */}
-                        <div className="absolute top-2 left-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDelete(resume.id);
-                            }}
-                            className="text-red-500 hover:text-red-700 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-opacity bg-white/80 backdrop-blur-sm"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </div>
-
-                      {/* Resume Info */}
-                      <div className="p-4 border-t border-gray-100">
-                        <h3 className="font-semibold text-gray-900 text-lg mb-2 truncate">
-                          {resume.title || "Untitled Resume"}
-                        </h3>
-                        <div className="flex items-center justify-between text-sm text-gray-500 mb-3">
-                          <div className="flex items-center">
-                            <Calendar className="w-4 h-4 mr-1" />
-                            Downloaded {formatDate(resume.downloaded_at)}
-                          </div>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <Badge variant="secondary" className="text-xs">
-                            {template?.name || "Modern Classic"}
-                          </Badge>
-                          <div className="flex gap-1">
+                        {/* Mobile Action Buttons */}
+                        {isMobile && (
+                          <div className="absolute bottom-2 left-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                             <Button
                               size="sm"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleEdit(resume.id);
                               }}
-                              className="bg-green-600 hover:bg-green-700 text-white"
+                              className="flex-1 bg-green-600 text-white hover:bg-green-700 shadow-lg text-xs py-2"
                             >
-                              <Edit className="w-4 h-4" />
+                              <Edit className="w-3 h-3 mr-1" />
+                              Edit
+                            </Button>
+                            <Button
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handlePreview(resume);
+                              }}
+                              className="flex-1 bg-gray-600 text-white hover:bg-gray-700 shadow-lg text-xs py-2"
+                            >
+                              <Eye className="w-3 h-3 mr-1" />
+                              Preview
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDelete(resume.id);
+                              }}
+                              className="bg-white/90 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 shadow-lg text-xs py-2"
+                            >
+                              <Trash2 className="w-3 h-3" />
                             </Button>
                           </div>
+                        )}
+
+                        {/* Desktop Delete Button */}
+                        {!isMobile && (
+                          <div className="absolute top-2 left-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDelete(resume.id);
+                              }}
+                              className="text-red-500 hover:text-red-700 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-opacity bg-white/80 backdrop-blur-sm"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Resume Info */}
+                      <div className={`${isMobile ? 'p-3' : 'p-4'} border-t border-gray-100`}>
+                        <h3 className={`font-semibold text-gray-900 ${isMobile ? 'text-base' : 'text-lg'} mb-2 truncate`}>
+                          {resume.title || "Untitled Resume"}
+                        </h3>
+                        <div className={`flex items-center justify-between ${isMobile ? 'text-xs' : 'text-sm'} text-gray-500 mb-3`}>
+                          <div className="flex items-center">
+                            <Calendar className="w-4 h-4 mr-1" />
+                            Downloaded {formatDate(resume.downloaded_at)}
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <Badge variant="secondary" className={`${isMobile ? 'text-xs' : 'text-xs'}`}>
+                            {template?.name || "Modern Classic"}
+                          </Badge>
+                          {!isMobile && (
+                            <div className="flex gap-1">
+                              <Button
+                                size="sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleEdit(resume.id);
+                                }}
+                                className="bg-green-600 hover:bg-green-700 text-white"
+                              >
+                                <Edit className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handlePreview(resume);
+                                }}
+                                className="bg-gray-600 hover:bg-gray-700 text-white"
+                              >
+                                <Eye className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </CardContent>
@@ -488,13 +558,13 @@ const DownloadedResumes = () => {
 
       {/* Enhanced Preview Modal */}
       <Dialog open={showPreviewModal} onOpenChange={setShowPreviewModal}>
-        <DialogContent className="max-w-5xl max-h-[90vh] p-0">
-          <DialogHeader className="p-6 pb-4 border-b">
-            <DialogTitle className="flex items-center justify-between text-xl">
+        <DialogContent className={`${isMobile ? 'max-w-[95vw] max-h-[95vh] m-2' : 'max-w-5xl max-h-[90vh]'} p-0`}>
+          <DialogHeader className={`${isMobile ? 'p-4 pb-3' : 'p-6 pb-4'} border-b`}>
+            <DialogTitle className={`flex ${isMobile ? 'flex-col gap-3' : 'items-center justify-between'} ${isMobile ? 'text-lg' : 'text-xl'}`}>
               <div className="flex items-center">
-                <Download className="w-6 h-6 mr-3 text-green-600" />
-                <span>{selectedResume?.title || "Downloaded Resume"}</span>
-                <Badge className="ml-3 bg-green-100 text-green-700">
+                <Download className={`${isMobile ? 'w-5 h-5' : 'w-6 h-6'} mr-3 text-green-600`} />
+                <span className="truncate">{selectedResume?.title || "Downloaded Resume"}</span>
+                <Badge className={`${isMobile ? 'ml-2' : 'ml-3'} bg-green-100 text-green-700`}>
                   Downloaded
                 </Badge>
               </div>
@@ -507,7 +577,7 @@ const DownloadedResumes = () => {
                     }
                   }}
                   size="sm"
-                  className="bg-green-600 hover:bg-green-700"
+                  className={`bg-green-600 hover:bg-green-700 ${isMobile ? 'text-sm px-3 py-2' : ''}`}
                 >
                   <Edit className="w-4 h-4 mr-2" />
                   Edit Resume
@@ -516,7 +586,7 @@ const DownloadedResumes = () => {
             </DialogTitle>
           </DialogHeader>
 
-          <div className="px-6 pb-6 overflow-y-auto">
+          <div className={`${isMobile ? 'px-4 pb-4' : 'px-6 pb-6'} overflow-y-auto`}>
             {selectedResume && (
               <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
                 <TemplateRenderer

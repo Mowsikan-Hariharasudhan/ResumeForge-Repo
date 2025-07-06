@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface PricingModalProps {
   isOpen: boolean;
@@ -37,6 +38,7 @@ export const PricingModal = ({ isOpen, onClose }: PricingModalProps) => {
   const { toast } = useToast();
   const { user } = useAuth();
   const [isProcessing, setIsProcessing] = useState(false);
+  const isMobile = useIsMobile();
 
   if (!isOpen) return null;
 
@@ -219,41 +221,41 @@ export const PricingModal = ({ isOpen, onClose }: PricingModalProps) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg max-w-7xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-6">
-          <div className="flex justify-between items-center mb-6">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-2 sm:p-4 z-50">
+      <div className={`bg-white rounded-lg ${isMobile ? 'w-full max-w-sm max-h-[95vh]' : 'max-w-7xl w-full max-h-[90vh]'} overflow-y-auto mobile-scroll`}>
+        <div className={`${isMobile ? 'p-4' : 'p-6'}`}>
+          <div className="flex justify-between items-center mb-4 sm:mb-6">
             <div className="text-center flex-1">
-              <h2 className="text-2xl font-bold">Choose Your Plan</h2>
-              <p className="text-gray-600">Unlock professional resume features</p>
+              <h2 className={`${isMobile ? 'text-xl' : 'text-2xl'} font-bold`}>Choose Your Plan</h2>
+              <p className={`text-gray-600 ${isMobile ? 'text-sm' : ''}`}>Unlock professional resume features</p>
             </div>
             <Button
               variant="ghost"
               size="sm"
               onClick={onClose}
-              className="ml-4"
+              className="ml-2 sm:ml-4"
             >
               <X className="w-4 h-4" />
             </Button>
           </div>
           
-          <div className="grid md:grid-cols-4 gap-6">
+          <div className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'md:grid-cols-4 gap-6'}`}>
             {/* Free Plan */}
             <Card className="border-2 border-gray-200">
               <CardHeader className="text-center">
                 <CardTitle className="flex items-center justify-center gap-2">
                   <Star className="w-5 h-5 text-yellow-500" />
-                  Free Preview
+                  <span className={`${isMobile ? 'text-sm' : ''}`}>Free Preview</span>
                 </CardTitle>
-                <div className="text-3xl font-bold text-gray-900">₹0</div>
-                <p className="text-gray-600">Perfect for exploring</p>
+                <div className={`${isMobile ? 'text-2xl' : 'text-3xl'} font-bold text-gray-900`}>₹0</div>
+                <p className={`text-gray-600 ${isMobile ? 'text-xs' : ''}`}>Perfect for exploring</p>
               </CardHeader>
               <CardContent className="space-y-4">
                 <ul className="space-y-2">
                   {features.free.map((feature, index) => (
                     <li key={index} className="flex items-center gap-3">
                       <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
-                      <span className="text-sm text-gray-600">{feature}</span>
+                      <span className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-600`}>{feature}</span>
                     </li>
                   ))}
                 </ul>
@@ -272,17 +274,17 @@ export const PricingModal = ({ isOpen, onClose }: PricingModalProps) => {
               <CardHeader className="text-center">
                 <CardTitle className="flex items-center justify-center gap-2">
                   <Download className="w-5 h-5 text-green-500" />
-                  Single Download
+                  <span className={`${isMobile ? 'text-sm' : ''}`}>Single Download</span>
                 </CardTitle>
-                <div className="text-3xl font-bold text-gray-900">₹1</div>
-                <p className="text-gray-600">One-time download</p>
+                <div className={`${isMobile ? 'text-2xl' : 'text-3xl'} font-bold text-gray-900`}>₹1</div>
+                <p className={`text-gray-600 ${isMobile ? 'text-xs' : ''}`}>One-time download</p>
               </CardHeader>
               <CardContent className="space-y-4">
                 <ul className="space-y-2">
                   {features.single.map((feature, index) => (
                     <li key={index} className="flex items-center gap-3">
                       <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
-                      <span className="text-sm text-gray-700">{feature}</span>
+                      <span className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700`}>{feature}</span>
                     </li>
                   ))}
                 </ul>
@@ -292,7 +294,7 @@ export const PricingModal = ({ isOpen, onClose }: PricingModalProps) => {
                   disabled={isProcessing}
                 >
                   <CreditCard className="w-4 h-4 mr-2" />
-                  {isProcessing ? 'Processing...' : 'Buy for ₹1'}
+                  {isProcessing ? 'Processing...' : '₹1'}
                 </Button>
               </CardContent>
             </Card>
@@ -300,24 +302,24 @@ export const PricingModal = ({ isOpen, onClose }: PricingModalProps) => {
             {/* Small Pack Plan */}
             <Card className="border-2 border-blue-500 shadow-lg relative">
               <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                <span className="bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-medium">
+                <span className={`bg-blue-500 text-white ${isMobile ? 'px-3 py-1 text-xs' : 'px-4 py-1 text-sm'} rounded-full font-medium`}>
                   Best Value
                 </span>
               </div>
               <CardHeader className="text-center">
                 <CardTitle className="flex items-center justify-center gap-2">
                   <Zap className="w-5 h-5 text-blue-500" />
-                  Small Pack
+                  <span className={`${isMobile ? 'text-sm' : ''}`}>Small Pack</span>
                 </CardTitle>
-                <div className="text-3xl font-bold text-gray-900">₹5</div>
-                <p className="text-gray-600">10 downloads • Great value</p>
+                <div className={`${isMobile ? 'text-2xl' : 'text-3xl'} font-bold text-gray-900`}>₹5</div>
+                <p className={`text-gray-600 ${isMobile ? 'text-xs' : ''}`}>10 downloads • Great value</p>
               </CardHeader>
               <CardContent className="space-y-4">
                 <ul className="space-y-2">
                   {features.small.map((feature, index) => (
                     <li key={index} className="flex items-center gap-3">
                       <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
-                      <span className="text-sm text-gray-700">{feature}</span>
+                      <span className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700`}>{feature}</span>
                     </li>
                   ))}
                 </ul>
@@ -327,7 +329,7 @@ export const PricingModal = ({ isOpen, onClose }: PricingModalProps) => {
                   disabled={isProcessing}
                 >
                   <CreditCard className="w-4 h-4 mr-2" />
-                  {isProcessing ? 'Processing...' : 'Buy Pack - ₹5'}
+                  {isProcessing ? 'Processing...' : '₹5'}
                 </Button>
               </CardContent>
             </Card>
@@ -335,24 +337,24 @@ export const PricingModal = ({ isOpen, onClose }: PricingModalProps) => {
             {/* Unlimited Plan */}
             <Card className="border-2 border-purple-500 shadow-lg relative">
               <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                <span className="bg-purple-500 text-white px-4 py-1 rounded-full text-sm font-medium">
+                <span className={`bg-purple-500 text-white ${isMobile ? 'px-3 py-1 text-xs' : 'px-4 py-1 text-sm'} rounded-full font-medium`}>
                   Premium
                 </span>
               </div>
               <CardHeader className="text-center">
                 <CardTitle className="flex items-center justify-center gap-2">
                   <Crown className="w-5 h-5 text-purple-500" />
-                  Unlimited Pack
+                  <span className={`${isMobile ? 'text-sm' : ''}`}>Unlimited Pack</span>
                 </CardTitle>
-                <div className="text-3xl font-bold text-gray-900">₹100</div>
-                <p className="text-gray-600">Unlimited downloads</p>
+                <div className={`${isMobile ? 'text-2xl' : 'text-3xl'} font-bold text-gray-900`}>₹100</div>
+                <p className={`text-gray-600 ${isMobile ? 'text-xs' : ''}`}>Unlimited downloads</p>
               </CardHeader>
               <CardContent className="space-y-4">
                 <ul className="space-y-2">
                   {features.unlimited.map((feature, index) => (
                     <li key={index} className="flex items-center gap-3">
                       <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
-                      <span className="text-sm text-gray-700">{feature}</span>
+                      <span className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-700`}>{feature}</span>
                     </li>
                   ))}
                 </ul>
@@ -362,14 +364,14 @@ export const PricingModal = ({ isOpen, onClose }: PricingModalProps) => {
                   disabled={isProcessing}
                 >
                   <CreditCard className="w-4 h-4 mr-2" />
-                  {isProcessing ? 'Processing...' : 'Buy Unlimited - ₹100'}
+                  {isProcessing ? 'Processing...' : '₹100'}
                 </Button>
               </CardContent>
             </Card>
           </div>
 
-          <div className="mt-6 text-center">
-            <div className="flex items-center justify-center gap-4 text-sm text-gray-600 mb-4">
+          <div className="mt-4 sm:mt-6 text-center">
+            <div className={`flex ${isMobile ? 'flex-col gap-2' : 'items-center justify-center gap-4'} ${isMobile ? 'text-xs' : 'text-sm'} text-gray-600 mb-4`}>
               <div className="flex items-center gap-1">
                 <Check className="w-4 h-4 text-green-500" />
                 <span>Secure Payment</span>
@@ -383,7 +385,7 @@ export const PricingModal = ({ isOpen, onClose }: PricingModalProps) => {
                 <span>Money Back Guarantee</span>
               </div>
             </div>
-            <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
+            <div className={`flex items-center justify-center gap-2 ${isMobile ? 'text-xs' : 'text-xs'} text-gray-500`}>
               <Shield className="w-4 h-4" />
               <span>Secured by Razorpay • By purchasing, you agree to our Terms of Service</span>
             </div>

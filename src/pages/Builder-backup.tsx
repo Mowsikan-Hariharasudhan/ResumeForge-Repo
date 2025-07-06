@@ -13,7 +13,8 @@ import { AuthModal } from "@/components/AuthModal";
 import { TemplateSelector } from "@/components/TemplateSelector";
 import { ResumePreview } from "@/components/ResumePreview";
 import { ResumePreviewModal } from "@/components/ResumePreviewModal";
-// import { BuilderSidebar } from "@/components/BuilderSidebar";
+import { BuilderSidebar } from "@/components/BuilderSidebar";
+import { PageNavigation } from "@/components/PageNavigation";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useResumes } from "@/hooks/useResumes";
 import { useAuth } from "@/hooks/useAuth";
@@ -37,12 +38,6 @@ import {
   Crown,
   Star,
   Palette,
-  Menu,
-  X,
-  Home,
-  FileText,
-  User,
-  Zap,
 } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import html2pdf from "html2pdf.js";
@@ -160,8 +155,9 @@ const Builder = () => {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showPreview, setShowPreview] = useState(true);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [currentTab, setCurrentTab] = useState("personal");
+  const [showSidebar, setShowSidebar] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   // Mobile detection
   const isMobile = useIsMobile();
@@ -189,54 +185,6 @@ const Builder = () => {
     projects: true,
   };
   const [visibleFields, setVisibleFields] = useState<Record<string, boolean>>(defaultVisibleFields);
-
-  // Tab navigation and progress tracking
-  const tabs = ["personal", "experience", "education", "skills", "additional"];
-  const getTabProgress = (tabId: string) => {
-    switch (tabId) {
-      case "personal":
-        return (resumeData.fullName && resumeData.email) ? 100 : 50;
-      case "experience":
-        return resumeData.experience.length > 0 ? 100 : 0;
-      case "education":
-        return resumeData.education.length > 0 ? 100 : 0;
-      case "skills":
-        return resumeData.skills.length > 0 ? 100 : 0;
-      case "additional":
-        return (resumeData.projects.length > 0 || resumeData.certifications.length > 0) ? 100 : 0;
-      default:
-        return 0;
-    }
-  };
-
-  // Keyboard navigation
-  useEffect(() => {
-    const handleKeydown = (e: KeyboardEvent) => {
-      if (e.ctrlKey || e.metaKey) {
-        switch (e.key) {
-          case "ArrowRight":
-            e.preventDefault();
-            const currentIndex = tabs.indexOf(currentTab);
-            const nextIndex = (currentIndex + 1) % tabs.length;
-            setCurrentTab(tabs[nextIndex]);
-            break;
-          case "ArrowLeft":
-            e.preventDefault();
-            const currentLeftIndex = tabs.indexOf(currentTab);
-            const prevIndex = (currentLeftIndex - 1 + tabs.length) % tabs.length;
-            setCurrentTab(tabs[prevIndex]);
-            break;
-          case "s":
-            e.preventDefault();
-            handleSave();
-            break;
-        }
-      }
-    };
-
-    window.addEventListener("keydown", handleKeydown);
-    return () => window.removeEventListener("keydown", handleKeydown);
-  }, [currentTab, tabs]);
 
   // Calculate total downloads remaining
   const totalDownloadsRemaining = purchases.reduce((total, purchase) => {
@@ -566,400 +514,173 @@ const Builder = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 relative">
+    <div className="min-h-screen bg-gray-50 flex">
       <ResumeEditLoader onLoadResume={handleLoadResume} />
 
-      {/* Inline Sidebar Component */}
-      {/* Mobile Overlay */}
-      {isMobile && sidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
       {/* Sidebar */}
-      <div className={`
-        fixed top-0 left-0 h-full bg-white border-r border-gray-200 shadow-lg z-50 transition-transform duration-300 ease-in-out
-        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-        ${isMobile ? 'w-80' : 'w-64'}
-      `}>
-        {/* Header */}
-        <div className="p-4 border-b border-gray-200">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <img 
-                src="/LOGO-RESUMIFY.png" 
-                alt="Resumify" 
-                className="h-8 w-8"
-              />
-              <h2 className="text-xl font-bold text-gray-900">Resumify</h2>
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setSidebarOpen(false)}
-              className="p-2"
-            >
-              <X className="w-5 h-5" />
-            </Button>
-          </div>
-        </div>
+      <BuilderSidebar
+        isOpen={showSidebar}
+        onToggle={() => setShowSidebar(!showSidebar)}
+        onPreview={() => isMobile ? setShowPreviewModal(true) : setShowPreview(!showPreview)}
+        onSave={handleSave}
+        onDownload={handleDownload}
+        onOpenTemplateSelector={() => setShowTemplateSelector(true)}
+        isSaving={isSaving}
+        isDownloading={isDownloading}
+        canDownload={canDownload}
+        totalDownloadsRemaining={totalDownloadsRemaining}
+        getUserDisplayName={getUserDisplayName}
+      />
 
-        {/* User Info */}
-        {user && (
-          <div className="p-4 border-b border-gray-200">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                <User className="w-5 h-5 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-900">
-                  {user.email}
-                </p>
-                <div className="flex items-center gap-1 mt-1">
-                  {canDownload ? (
-                    <Badge
-                      variant="outline"
-                      className="text-green-600 border-green-200 bg-green-50 text-xs"
-                    >
-                      <Download className="w-3 h-3 mr-1" />
-                      {totalDownloadsRemaining === 999999
-                        ? "Unlimited"
-                        : `${totalDownloadsRemaining} Downloads Left`}
-                    </Badge>
-                  ) : (
-                    <Badge
-                      variant="outline"
-                      className="text-orange-600 border-orange-200 bg-orange-50 text-xs"
-                    >
-                      <Crown className="w-3 h-3 mr-1" />
-                      No Downloads
-                    </Badge>
-                  )}
+      {/* Main Content */}
+      <div className={`flex-1 transition-all duration-300 ${isMobile ? 'ml-0' : 'lg:ml-80'}`}>
+        {/* Mobile Header */}
+        {isMobile && (
+          <div className="bg-white border-b p-4 shadow-sm">
+            <div className="flex items-center justify-between">
+              <h1 className="text-lg font-semibold text-gray-900">
+                Resume Builder
+              </h1>
+              {/* Download Progress */}
+              {isDownloading && (
+                <div className="flex items-center space-x-2">
+                  <div className="w-32">
+                    <Progress value={downloadProgress} className="h-2" />
+                  </div>
+                  <span className="text-sm text-gray-600">
+                    {Math.round(downloadProgress)}%
+                  </span>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         )}
 
-        {/* Navigation */}
-        <nav className="p-4 space-y-2">
-          <Button
-            variant="ghost"
-            className="w-full justify-start gap-3 px-3 py-2 h-auto"
-            asChild
-          >
-            <a href="/">
-              <Home className="w-5 h-5" />
-              <span className="font-medium">Home</span>
-            </a>
-          </Button>
-          
-          <Button
-            variant="ghost"
-            className="w-full justify-start gap-3 px-3 py-2 h-auto"
-            asChild
-          >
-            <a href="/my-resumes">
-              <FileText className="w-5 h-5" />
-              <span className="font-medium">Saved Resumes</span>
-            </a>
-          </Button>
-          
-          <Button
-            variant="ghost"
-            className="w-full justify-start gap-3 px-3 py-2 h-auto"
-            asChild
-          >
-            <a href="/downloaded">
-              <Download className="w-5 h-5" />
-              <span className="font-medium">Downloads</span>
-            </a>
-          </Button>
-          
-          <Button
-            variant="ghost"
-            className="w-full justify-start gap-3 px-3 py-2 h-auto"
-            onClick={() => setShowTemplateSelector(true)}
-          >
-            <Palette className="w-5 h-5" />
-            <span className="font-medium">Templates</span>
-          </Button>
-          
-          <Button
-            variant="ghost"
-            className="w-full justify-start gap-3 px-3 py-2 h-auto"
-            onClick={() => setShowPreviewModal(true)}
-          >
-            <Eye className="w-5 h-5" />
-            <span className="font-medium">Preview</span>
-          </Button>
-          
-          <Button
-            variant="ghost"
-            className={`
-              w-full justify-start gap-3 px-3 py-2 h-auto
-              ${isSaving || !user ? 'opacity-50 cursor-not-allowed' : ''}
-            `}
-            onClick={handleSave}
-            disabled={isSaving || !user}
-          >
-            <Save className="w-5 h-5" />
-            <span className="font-medium">Save Resume</span>
-            {isSaving && (
-              <div className="ml-auto">
-                <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
-              </div>
-            )}
-          </Button>
-          
-          <Button
-            variant="ghost"
-            className={`
-              w-full justify-start gap-3 px-3 py-2 h-auto
-              ${!canDownload ? 'opacity-50 cursor-not-allowed' : ''}
-            `}
-            onClick={handleDownload}
-            disabled={!canDownload}
-          >
-            <Download className="w-5 h-5" />
-            <span className="font-medium">Download PDF</span>
-          </Button>
-        </nav>
+        {/* Content Area */}
+        <div className="flex h-full">
+          {/* Form Panel */}
+          <div className={`${!isMobile && showPreview ? 'w-1/2' : 'w-full'} transition-all duration-300`}>
+            <div className="p-6 h-full overflow-y-auto">
+              <div className="space-y-6">
 
-        {/* Footer */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200">
-          <div className="text-center">
-            <p className="text-xs text-gray-500">
-              © 2025 Resumify. All rights reserved.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Simple Sidebar */}
-      {sidebarOpen && (
-        <>
-          {/* Mobile Overlay */}
-          {isMobile && (
-            <div 
-              className="fixed inset-0 bg-black/50 z-40 lg:hidden"
-              onClick={() => setSidebarOpen(false)}
-            />
-          )}
-
-          {/* Sidebar */}
-          <div className={`
-            fixed top-0 left-0 h-full bg-white border-r border-gray-200 shadow-lg z-50 transition-transform duration-300 ease-in-out
-            ${isMobile ? 'w-80' : 'w-64'}
-          `}>
-            {/* Header */}
-            <div className="p-4 border-b border-gray-200">
+      {/* Header */}
+      <div className="bg-white border-b sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-4 py-4">
+          {/* Mobile Header Layout */}
+          {isMobile ? (
+            <div className="space-y-3">
+              {/* Mobile Header Row 1 - Title and Download Status */}
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <img 
-                    src="/LOGO-RESUMIFY.png" 
-                    alt="Resumify" 
-                    className="h-8 w-8"
-                  />
-                  <h2 className="text-xl font-bold text-gray-900">Resumify</h2>
-                </div>
+                <h1 className="text-lg sm:text-xl font-bold text-gray-900 truncate">
+                  {getUserDisplayName()}
+                </h1>
+                {user && (
+                  <div className="flex items-center">
+                    {canDownload ? (
+                      <Badge
+                        variant="outline"
+                        className="text-green-600 border-green-200 bg-green-50 text-xs px-2 py-1"
+                      >
+                        <Download className="w-3 h-3 mr-1" />
+                        {totalDownloadsRemaining === 999999
+                          ? "Unlimited"
+                          : `${totalDownloadsRemaining} Left`}
+                      </Badge>
+                    ) : (
+                      <Badge
+                        variant="outline"
+                        className="text-orange-600 border-orange-200 bg-orange-50 text-xs px-2 py-1"
+                      >
+                        <Crown className="w-3 h-3 mr-1" />
+                        No Downloads
+                      </Badge>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Mobile Header Row 2 - Action Buttons */}
+              <div className="flex items-center gap-2">
+                {/* Mobile Preview Button */}
                 <Button
-                  variant="ghost"
+                  variant="outline"
                   size="sm"
-                  onClick={() => setSidebarOpen(false)}
-                  className="p-2"
+                  onClick={() => setShowPreviewModal(true)}
+                  className="flex-1 h-10"
                 >
-                  <X className="w-5 h-5" />
+                  <Eye className="w-4 h-4 mr-2" />
+                  Preview
+                </Button>
+
+                <Button
+                  onClick={handleSave}
+                  disabled={isSaving || !user}
+                  variant="outline"
+                  size="sm"
+                  className="flex-1 h-10"
+                >
+                  {isSaving ? (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  ) : (
+                    <Save className="w-4 h-4 mr-2" />
+                  )}
+                  Save
+                </Button>
+
+                <Button
+                  onClick={handleDownload}
+                  disabled={isDownloading}
+                  className="bg-gradient-primary hover:opacity-90 flex-1 h-10"
+                  size="sm"
+                >
+                  {isDownloading ? (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  ) : (
+                    <Download className="w-4 h-4 mr-2" />
+                  )}
+                  Download
                 </Button>
               </div>
             </div>
-
-            {/* User Info */}
-            {user && (
-              <div className="p-4 border-b border-gray-200">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                    <User className="w-5 h-5 text-blue-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">
-                      {user.email}
-                    </p>
-                    <div className="flex items-center gap-1 mt-1">
-                      {canDownload ? (
-                        <Badge
-                          variant="outline"
-                          className="text-green-600 border-green-200 bg-green-50 text-xs"
-                        >
-                          <Download className="w-3 h-3 mr-1" />
-                          {totalDownloadsRemaining === 999999
-                            ? "Unlimited"
-                            : `${totalDownloadsRemaining} Downloads Left`}
-                        </Badge>
-                      ) : (
-                        <Badge
-                          variant="outline"
-                          className="text-orange-600 border-orange-200 bg-orange-50 text-xs"
-                        >
-                          <Crown className="w-3 h-3 mr-1" />
-                          No Downloads
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Navigation */}
-            <nav className="p-4 space-y-2">
-              <Button
-                variant="ghost"
-                className="w-full justify-start gap-3 px-3 py-2 h-auto"
-                asChild
-              >
-                <a href="/">
-                  <Home className="w-5 h-5" />
-                  <span className="font-medium">Home</span>
-                </a>
-              </Button>
-              
-              <Button
-                variant="ghost"
-                className="w-full justify-start gap-3 px-3 py-2 h-auto"
-                asChild
-              >
-                <a href="/my-resumes">
-                  <FileText className="w-5 h-5" />
-                  <span className="font-medium">Saved Resumes</span>
-                </a>
-              </Button>
-              
-              <Button
-                variant="ghost"
-                className="w-full justify-start gap-3 px-3 py-2 h-auto"
-                asChild
-              >
-                <a href="/downloaded">
-                  <Download className="w-5 h-5" />
-                  <span className="font-medium">Downloads</span>
-                </a>
-              </Button>
-              
-              <Button
-                variant="ghost"
-                className="w-full justify-start gap-3 px-3 py-2 h-auto"
-                onClick={() => setShowTemplateSelector(true)}
-              >
-                <Palette className="w-5 h-5" />
-                <span className="font-medium">Templates</span>
-              </Button>
-              
-              <Button
-                variant="ghost"
-                className="w-full justify-start gap-3 px-3 py-2 h-auto"
-                onClick={() => setShowPreviewModal(true)}
-              >
-                <Eye className="w-5 h-5" />
-                <span className="font-medium">Preview</span>
-              </Button>
-              
-              <Button
-                variant="ghost"
-                className={`w-full justify-start gap-3 px-3 py-2 h-auto ${
-                  isSaving || !user ? 'opacity-50 cursor-not-allowed' : ''
-                }`}
-                onClick={handleSave}
-                disabled={isSaving || !user}
-              >
-                <Save className="w-5 h-5" />
-                <span className="font-medium">Save Resume</span>
-                {isSaving && (
-                  <div className="ml-auto">
-                    <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+          ) : (
+            /* Desktop Header Layout */
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <h1 className="text-2xl font-bold text-gray-900">
+                  {getUserDisplayName()}
+                </h1>
+                {user && (
+                  <div className="flex items-center gap-2">
+                    {canDownload ? (
+                      <Badge
+                        variant="outline"
+                        className="text-green-600 border-green-200 bg-green-50"
+                      >
+                        <Download className="w-3 h-3 mr-1" />
+                        {totalDownloadsRemaining === 999999
+                          ? "Unlimited"
+                          : `${totalDownloadsRemaining} Downloads Remaining`}
+                      </Badge>
+                    ) : (
+                      <Badge
+                        variant="outline"
+                        className="text-orange-600 border-orange-200 bg-orange-50"
+                      >
+                        <Crown className="w-3 h-3 mr-1" />
+                        No Downloads Remaining
+                      </Badge>
+                    )}
                   </div>
                 )}
-              </Button>
-              
-              <Button
-                variant="ghost"
-                className={`w-full justify-start gap-3 px-3 py-2 h-auto ${
-                  !canDownload ? 'opacity-50 cursor-not-allowed' : ''
-                }`}
-                onClick={handleDownload}
-                disabled={!canDownload}
-              >
-                <Download className="w-5 h-5" />
-                <span className="font-medium">Download PDF</span>
-              </Button>
-            </nav>
-
-            {/* Footer */}
-            <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200">
-              <div className="text-center">
-                <p className="text-xs text-gray-500">
-                  © 2025 Resumify. All rights reserved.
-                </p>
               </div>
-            </div>
-          </div>
-        </>
-      )}
 
-      {/* Main Content */}
-      <div className={`transition-all duration-300 ${sidebarOpen && !isMobile ? 'ml-64' : 'ml-0'}`}>
-        {/* Top Bar */}
-        <div className="bg-white border-b sticky top-0 z-30 px-4 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              {/* Menu Toggle Button */}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="p-2"
-              >
-                <Menu className="w-5 h-5" />
-              </Button>
-              
-              <h1 className="text-xl font-bold text-gray-900">
-                Resume Builder
-              </h1>
-              {user && (
-                <Badge
-                  variant="outline"
-                  className={`text-xs px-2 py-1 ${
-                    canDownload 
-                      ? 'text-green-600 border-green-200 bg-green-50'
-                      : 'text-orange-600 border-orange-200 bg-orange-50'
-                  }`}
-                >
-                  {canDownload ? (
-                    <>
-                      <Download className="w-3 h-3 mr-1" />
-                      {totalDownloadsRemaining === 999999
-                        ? "Unlimited"
-                        : `${totalDownloadsRemaining} Downloads Left`}
-                    </>
-                  ) : (
-                    <>
-                      <Crown className="w-3 h-3 mr-1" />
-                      No Downloads
-                    </>
-                  )}
-                </Badge>
-              )}
-            </div>
-
-            {/* Desktop Actions */}
-            {!isMobile && (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
+                {/* Desktop Preview Toggle */}
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setShowPreview(!showPreview)}
+                  className="hidden lg:flex"
                 >
                   {showPreview ? (
                     <EyeOff className="w-4 h-4 mr-2" />
@@ -968,6 +689,7 @@ const Builder = () => {
                   )}
                   {showPreview ? "Hide Preview" : "Show Preview"}
                 </Button>
+
                 <Button
                   onClick={handleSave}
                   disabled={isSaving || !user}
@@ -979,8 +701,9 @@ const Builder = () => {
                   ) : (
                     <Save className="w-4 h-4 mr-2" />
                   )}
-                  Save
+                  Save Resume
                 </Button>
+
                 <Button
                   onClick={handleDownload}
                   disabled={isDownloading}
@@ -992,11 +715,11 @@ const Builder = () => {
                   ) : (
                     <Download className="w-4 h-4 mr-2" />
                   )}
-                  Download
+                  Download PDF
                 </Button>
               </div>
-            )}
-          </div>
+            </div>
+          )}
 
           {/* Download Progress */}
           {isDownloading && (
@@ -1009,212 +732,39 @@ const Builder = () => {
             </div>
           )}
         </div>
+      </div>
 
-        {/* Main Content */}
-        <div className="max-w-7xl mx-auto p-4">
-          <ResizablePanelGroup
-            direction="horizontal"
-            className="min-h-[calc(100vh-120px)]"
-          >
-            {/* Editor Panel */}
-            <ResizablePanel defaultSize={(!isMobile && showPreview) ? 50 : 100} minSize={30}>
-              <Card className="h-full">
-                <CardContent className="p-6 h-full overflow-y-auto">
-                  <div className="space-y-6">
-                    {/* Resume Actions */}
-                    <ResumeActions
-                      currentTemplate={currentTemplate}
-                      onTemplateChange={handleTemplateChange}
-                      onSave={handleSave}
-                      onDownload={handleDownload}
-                      onOpenTemplateSelector={() => setShowTemplateSelector(true)}
-                      isSaving={isSaving}
-                      title={resumeTitle}
-                      onTitleChange={setResumeTitle}
-                    />
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto p-4">
+        <ResizablePanelGroup
+          direction="horizontal"
+          className="min-h-[calc(100vh-120px)]"
+        >
+          {/* Editor Panel */}
+          <ResizablePanel defaultSize={(!isMobile && showPreview) ? 50 : 100} minSize={30}>
+            <Card className="h-full">
+              <CardContent className="p-6 h-full overflow-y-auto">
+                <div className="space-y-6">
+                  {/* Resume Actions */}
+                  <ResumeActions
+                    currentTemplate={currentTemplate}
+                    onTemplateChange={handleTemplateChange}
+                    onSave={handleSave}
+                    onDownload={handleDownload}
+                    onOpenTemplateSelector={() => setShowTemplateSelector(true)}
+                    isSaving={isSaving}
+                    title={resumeTitle}
+                    onTitleChange={setResumeTitle}
+                  />
 
-                    {/* Form Tabs - Enhanced UX */}
-                    <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
-                      <div className="sticky top-0 bg-white z-10 pb-2 border-b">
-                        <div className="flex items-center justify-between mb-2">
-                          <h3 className="text-sm font-medium text-gray-700">Resume Builder</h3>
-                          
-                        </div>
-                        
-                        {/* Mobile Scrollable Tabs */}
-                        <div className="block sm:hidden">
-                          <div className="flex overflow-x-auto scrollbar-hide gap-2 pb-2">
-                            <button
-                              onClick={() => setCurrentTab("personal")}
-                              className={`flex-shrink-0 flex flex-col items-center gap-1 px-4 py-3 rounded-lg transition-all duration-200 ${
-                                currentTab === "personal"
-                                  ? "bg-blue-600 text-white"
-                                  : "bg-gray-50 text-gray-600 hover:bg-blue-50"
-                              }`}
-                            >
-                              <User className="w-4 h-4" />
-                              <span className="text-xs">Info</span>
-                              <div className="w-full bg-gray-200 rounded-full h-1 mt-1">
-                                <div 
-                                  className="bg-green-500 h-1 rounded-full transition-all duration-300" 
-                                  style={{ width: `${getTabProgress("personal")}%` }}
-                                />
-                              </div>
-                            </button>
-                            
-                            <button
-                              onClick={() => setCurrentTab("experience")}
-                              className={`flex-shrink-0 flex flex-col items-center gap-1 px-4 py-3 rounded-lg transition-all duration-200 ${
-                                currentTab === "experience"
-                                  ? "bg-blue-600 text-white"
-                                  : "bg-gray-50 text-gray-600 hover:bg-blue-50"
-                              }`}
-                            >
-                              <FileText className="w-4 h-4" />
-                              <span className="text-xs">Work</span>
-                              <div className="w-full bg-gray-200 rounded-full h-1 mt-1">
-                                <div 
-                                  className="bg-green-500 h-1 rounded-full transition-all duration-300" 
-                                  style={{ width: `${getTabProgress("experience")}%` }}
-                                />
-                              </div>
-                            </button>
-                            
-                            <button
-                              onClick={() => setCurrentTab("education")}
-                              className={`flex-shrink-0 flex flex-col items-center gap-1 px-4 py-3 rounded-lg transition-all duration-200 ${
-                                currentTab === "education"
-                                  ? "bg-blue-600 text-white"
-                                  : "bg-gray-50 text-gray-600 hover:bg-blue-50"
-                              }`}
-                            >
-                              <Star className="w-4 h-4" />
-                              <span className="text-xs">Edu</span>
-                              <div className="w-full bg-gray-200 rounded-full h-1 mt-1">
-                                <div 
-                                  className="bg-green-500 h-1 rounded-full transition-all duration-300" 
-                                  style={{ width: `${getTabProgress("education")}%` }}
-                                />
-                              </div>
-                            </button>
-                            
-                            <button
-                              onClick={() => setCurrentTab("skills")}
-                              className={`flex-shrink-0 flex flex-col items-center gap-1 px-4 py-3 rounded-lg transition-all duration-200 ${
-                                currentTab === "skills"
-                                  ? "bg-blue-600 text-white"
-                                  : "bg-gray-50 text-gray-600 hover:bg-blue-50"
-                              }`}
-                            >
-                              <Zap className="w-4 h-4" />
-                              <span className="text-xs">Skills</span>
-                              <div className="w-full bg-gray-200 rounded-full h-1 mt-1">
-                                <div 
-                                  className="bg-green-500 h-1 rounded-full transition-all duration-300" 
-                                  style={{ width: `${getTabProgress("skills")}%` }}
-                                />
-                              </div>
-                            </button>
-                            
-                            <button
-                              onClick={() => setCurrentTab("additional")}
-                              className={`flex-shrink-0 flex flex-col items-center gap-1 px-4 py-3 rounded-lg transition-all duration-200 ${
-                                currentTab === "additional"
-                                  ? "bg-blue-600 text-white"
-                                  : "bg-gray-50 text-gray-600 hover:bg-blue-50"
-                              }`}
-                            >
-                              <Plus className="w-4 h-4" />
-                              <span className="text-xs">More</span>
-                              <div className="w-full bg-gray-200 rounded-full h-1 mt-1">
-                                <div 
-                                  className="bg-green-500 h-1 rounded-full transition-all duration-300" 
-                                  style={{ width: `${getTabProgress("additional")}%` }}
-                                />
-                              </div>
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* Desktop Grid Tabs */}
-                        <TabsList className="hidden sm:grid w-full grid-cols-3 md:grid-cols-5 gap-1 h-auto p-1 bg-gray-50 rounded-lg">
-                          <TabsTrigger 
-                            value="personal" 
-                            className="text-sm py-3 px-3 data-[state=active]:bg-blue-600 data-[state=active]:text-white transition-all duration-200 hover:bg-blue-50 focus:ring-2 focus:ring-blue-300 focus:ring-offset-1 relative"
-                          >
-                            <div className="flex flex-col items-center gap-1">
-                              <User className="w-4 h-4" />
-                              <span>Personal</span>
-                              <div className="w-full bg-gray-200 rounded-full h-1 mt-1">
-                                <div 
-                                  className="bg-green-500 h-1 rounded-full transition-all duration-300" 
-                                  style={{ width: `${getTabProgress("personal")}%` }}
-                                />
-                              </div>
-                            </div>
-                          </TabsTrigger>
-                          <TabsTrigger 
-                            value="experience" 
-                            className="text-sm py-3 px-3 data-[state=active]:bg-blue-600 data-[state=active]:text-white transition-all duration-200 hover:bg-blue-50 focus:ring-2 focus:ring-blue-300 focus:ring-offset-1 relative"
-                          >
-                            <div className="flex flex-col items-center gap-1">
-                              <FileText className="w-4 h-4" />
-                              <span>Experience</span>
-                              <div className="w-full bg-gray-200 rounded-full h-1 mt-1">
-                                <div 
-                                  className="bg-green-500 h-1 rounded-full transition-all duration-300" 
-                                  style={{ width: `${getTabProgress("experience")}%` }}
-                                />
-                              </div>
-                            </div>
-                          </TabsTrigger>
-                          <TabsTrigger 
-                            value="education" 
-                            className="text-sm py-3 px-3 data-[state=active]:bg-blue-600 data-[state=active]:text-white transition-all duration-200 hover:bg-blue-50 focus:ring-2 focus:ring-blue-300 focus:ring-offset-1 relative"
-                          >
-                            <div className="flex flex-col items-center gap-1">
-                              <Star className="w-4 h-4" />
-                              <span>Education</span>
-                              <div className="w-full bg-gray-200 rounded-full h-1 mt-1">
-                                <div 
-                                  className="bg-green-500 h-1 rounded-full transition-all duration-300" 
-                                  style={{ width: `${getTabProgress("education")}%` }}
-                                />
-                              </div>
-                            </div>
-                          </TabsTrigger>
-                          <TabsTrigger 
-                            value="skills" 
-                            className="text-sm py-3 px-3 data-[state=active]:bg-blue-600 data-[state=active]:text-white transition-all duration-200 hover:bg-blue-50 focus:ring-2 focus:ring-blue-300 focus:ring-offset-1 relative"
-                          >
-                            <div className="flex flex-col items-center gap-1">
-                              <Zap className="w-4 h-4" />
-                              <span>Skills</span>
-                              <div className="w-full bg-gray-200 rounded-full h-1 mt-1">
-                                <div 
-                                  className="bg-green-500 h-1 rounded-full transition-all duration-300" 
-                                  style={{ width: `${getTabProgress("skills")}%` }}
-                                />
-                              </div>
-                            </div>
-                          </TabsTrigger>
-                          <TabsTrigger 
-                            value="additional" 
-                            className="text-sm py-3 px-3 data-[state=active]:bg-blue-600 data-[state=active]:text-white transition-all duration-200 hover:bg-blue-50 focus:ring-2 focus:ring-blue-300 focus:ring-offset-1 relative"
-                          >
-                            <div className="flex flex-col items-center gap-1">
-                              <Plus className="w-4 h-4" />
-                              <span>More</span>
-                              <div className="w-full bg-gray-200 rounded-full h-1 mt-1">
-                                <div 
-                                  className="bg-green-500 h-1 rounded-full transition-all duration-300" 
-                                  style={{ width: `${getTabProgress("additional")}%` }}
-                                />
-                              </div>
-                            </div>
-                          </TabsTrigger>
-                        </TabsList>
-                      </div>
+                  {/* Form Tabs */}
+                  <Tabs defaultValue="personal" className="w-full">
+                    <TabsList className="w-full grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2">
+                      <TabsTrigger value="personal">Personal</TabsTrigger>
+                      <TabsTrigger value="experience">Experience</TabsTrigger>
+                      <TabsTrigger value="education">Education</TabsTrigger>
+                      <TabsTrigger value="skills">Skills</TabsTrigger>
+                    </TabsList>
 
                     {/* Personal Information */}
                     <TabsContent value="personal" className="space-y-4">
@@ -1794,7 +1344,7 @@ const Builder = () => {
                           minHeight: "297mm",
                           transform: `scale(${zoom})`,
                           transformOrigin: "top center",
-                          marginBottom: zoom < 0.6 ? "-200px" : "0",
+                          marginBottom: zoom < 0.6 ? "-200px" : "20px",
                         }}
                       >
                         {/* Watermark Overlay */}
@@ -1848,7 +1398,6 @@ const Builder = () => {
             </>
           )}
         </ResizablePanelGroup>
-      </div>
       </div>
 
       {/* Mobile Floating Action Button for Preview */}

@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ZoomIn, ZoomOut, RotateCcw, Maximize2, Minimize2 } from 'lucide-react';
 import { ResumeData } from '@/types/resume';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface EnhancedResumePreviewProps {
   data: ResumeData;
@@ -23,19 +24,25 @@ export const EnhancedResumePreview = ({
   const [isFullscreen, setIsFullscreen] = useState(false);
   const previewRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
 
   const zoomIn = () => setZoom(prev => Math.min(prev + 0.1, 2));
   const zoomOut = () => setZoom(prev => Math.max(prev - 0.1, 0.3));
-  const resetZoom = () => setZoom(0.6);
+  const resetZoom = () => setZoom(isMobile ? 0.4 : 0.6);
   
   const toggleFullscreen = () => {
     setIsFullscreen(!isFullscreen);
     if (!isFullscreen) {
-      setZoom(0.8);
+      setZoom(isMobile ? 0.5 : 0.8);
     } else {
-      setZoom(0.6);
+      setZoom(isMobile ? 0.4 : 0.6);
     }
   };
+
+  // Set initial zoom based on device
+  useEffect(() => {
+    setZoom(isMobile ? 0.4 : 0.6);
+  }, [isMobile]);
 
   // Handle keyboard shortcuts
   useEffect(() => {
@@ -86,26 +93,30 @@ export const EnhancedResumePreview = ({
       className={`${className} ${isFullscreen ? 'fixed inset-0 z-50 bg-white' : ''}`}
     >
       <Card className="h-full">
-        <CardHeader className="pb-3">
+        <CardHeader className={`${isMobile ? 'pb-2' : 'pb-3'}`}>
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <CardTitle className="text-lg">Live Preview</CardTitle>
-              <Badge variant="outline" className="text-xs">
-                {getTemplateDisplayName(template)}
-              </Badge>
-            </div>
             <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1 border rounded-md p-1">
+              <CardTitle className={`${isMobile ? 'text-base' : 'text-lg'}`}>
+                {isMobile ? 'Preview' : 'Live Preview'}
+              </CardTitle>
+              {!isMobile && (
+                <Badge variant="outline" className="text-xs">
+                  {getTemplateDisplayName(template)}
+                </Badge>
+              )}
+            </div>
+            <div className="flex items-center gap-1">
+              <div className={`flex items-center gap-1 border rounded-md p-1 ${isMobile ? 'scale-90' : ''}`}>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={zoomOut}
                   disabled={zoom <= 0.3}
-                  className="h-7 w-7 p-0"
+                  className={`${isMobile ? 'h-6 w-6' : 'h-7 w-7'} p-0`}
                 >
-                  <ZoomOut className="w-3 h-3" />
+                  <ZoomOut className={`${isMobile ? 'w-3 h-3' : 'w-3 h-3'}`} />
                 </Button>
-                <span className="text-xs font-mono min-w-[3rem] text-center">
+                <span className={`${isMobile ? 'text-xs' : 'text-xs'} font-mono ${isMobile ? 'min-w-[2.5rem]' : 'min-w-[3rem]'} text-center`}>
                   {Math.round(zoom * 100)}%
                 </span>
                 <Button
@@ -113,42 +124,63 @@ export const EnhancedResumePreview = ({
                   size="sm"
                   onClick={zoomIn}
                   disabled={zoom >= 2}
-                  className="h-7 w-7 p-0"
+                  className={`${isMobile ? 'h-6 w-6' : 'h-7 w-7'} p-0`}
                 >
-                  <ZoomIn className="w-3 h-3" />
+                  <ZoomIn className={`${isMobile ? 'w-3 h-3' : 'w-3 h-3'}`} />
                 </Button>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={resetZoom}
-                  className="h-7 w-7 p-0"
+                  className={`${isMobile ? 'h-6 w-6' : 'h-7 w-7'} p-0`}
                 >
-                  <RotateCcw className="w-3 h-3" />
+                  <RotateCcw className={`${isMobile ? 'w-3 h-3' : 'w-3 h-3'}`} />
                 </Button>
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={toggleFullscreen}
-                className="h-7 w-7 p-0"
-              >
-                {isFullscreen ? (
-                  <Minimize2 className="w-3 h-3" />
-                ) : (
-                  <Maximize2 className="w-3 h-3" />
-                )}
-              </Button>
+              {!isMobile && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={toggleFullscreen}
+                  className="h-7 w-7 p-0"
+                >
+                  {isFullscreen ? (
+                    <Minimize2 className="w-3 h-3" />
+                  ) : (
+                    <Maximize2 className="w-3 h-3" />
+                  )}
+                </Button>
+              )}
             </div>
           </div>
+          
+          {/* Mobile template badge */}
+          {isMobile && (
+            <div className="mt-2">
+              <Badge variant="outline" className="text-xs">
+                {getTemplateDisplayName(template)}
+              </Badge>
+            </div>
+          )}
         </CardHeader>
         <div
           ref={previewRef}
-          className="relative bg-gray-100 flex justify-center items-center overflow-auto"
-          style={{ height: isFullscreen ? 'calc(100vh - 60px)' : '600px' }}
+          className={`relative bg-gray-100 flex justify-center items-center overflow-auto ${isMobile ? 'mobile-scroll' : ''}`}
+          style={{ 
+            height: isFullscreen 
+              ? 'calc(100vh - 60px)' 
+              : isMobile 
+                ? 'calc(100vh - 160px)' 
+                : '600px' 
+          }}
         >
           <div
             className="transition-transform duration-200"
-            style={{ transform: `scale(${zoom})`, transformOrigin: 'top center', width: '100%' }}
+            style={{ 
+              transform: `scale(${zoom})`, 
+              transformOrigin: isMobile ? 'top left' : 'top center', 
+              width: isMobile ? '100%' : 'auto' 
+            }}
           >
             <ResumePreview data={data} template={template} visibleFields={visibleFields} />
           </div>
