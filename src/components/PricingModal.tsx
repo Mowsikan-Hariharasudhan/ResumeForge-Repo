@@ -236,25 +236,30 @@ export const PricingModal = ({ isOpen, onClose }: PricingModalProps) => {
               className="ml-2 sm:ml-4"
             >
               <X className="w-4 h-4" />
-            </Button>
+            <p className={`text-gray-600 ${isMobile ? 'text-sm' : ''}`}>You've used your free download. Choose a plan to continue.</p>
           </div>
           
           <div className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'md:grid-cols-4 gap-6'}`}>
             {/* Free Plan */}
-            <Card className="border-2 border-gray-200">
+            <Card className="border-2 border-gray-200 opacity-60">
               <CardHeader className="text-center">
                 <CardTitle className="flex items-center justify-center gap-2">
                   <Star className="w-5 h-5 text-yellow-500" />
-                  <span className={`${isMobile ? 'text-sm' : ''}`}>Free Preview</span>
+                  <span className={`${isMobile ? 'text-sm' : ''}`}>Free Download</span>
                 </CardTitle>
                 <div className={`${isMobile ? 'text-2xl' : 'text-3xl'} font-bold text-gray-900`}>₹0</div>
-                <p className={`text-gray-600 ${isMobile ? 'text-xs' : ''}`}>Perfect for exploring</p>
+                <p className={`text-gray-600 ${isMobile ? 'text-xs' : ''}`}>Already used</p>
               </CardHeader>
               <CardContent className="space-y-4">
                 <ul className="space-y-2">
-                  {features.free.map((feature, index) => (
+                  {[
+                    "1 free PDF download",
+                    "Live preview",
+                    "Basic templates",
+                    "Already claimed"
+                  ].map((feature, index) => (
                     <li key={index} className="flex items-center gap-3">
-                      <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
+                      <Check className={`w-4 h-4 ${index === 3 ? 'text-gray-400' : 'text-green-500'} flex-shrink-0`} />
                       <span className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-600`}>{feature}</span>
                     </li>
                   ))}
@@ -262,9 +267,9 @@ export const PricingModal = ({ isOpen, onClose }: PricingModalProps) => {
                 <Button 
                   variant="outline" 
                   className="w-full"
-                  onClick={onClose}
+                  disabled
                 >
-                  Continue Free
+                  Already Used
                 </Button>
               </CardContent>
             </Card>

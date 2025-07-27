@@ -132,12 +132,47 @@ export type Database = {
         }
         Relationships: []
       }
+      user_free_downloads: {
+        Row: {
+          created_at: string
+          downloads_remaining: number
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          downloads_remaining?: number
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          downloads_remaining?: number
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      consume_free_download: {
+        Args: {
+          user_id: string
+        }
+        Returns: boolean
+      }
+      initialize_free_downloads: {
+        Args: {
+          user_id: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useFreeDownloads } from '@/hooks/useFreeDownloads';
 
 interface Purchase {
   id: string;
@@ -13,9 +14,9 @@ interface Purchase {
 
 export const usePurchases = () => {
   const [purchases, setPurchases] = useState<Purchase[]>([]);
-  const [canDownload, setCanDownload] = useState(false);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
+  const { hasFreeDownloads, freeDownloadsRemaining, consumeFreeDownload } = useFreeDownloads();
 
   // Calculate total downloads remaining
   const totalDownloadsRemaining = purchases.reduce((total, purchase) => {
@@ -23,6 +24,11 @@ export const usePurchases = () => {
     return isNotExpired ? total + purchase.downloads_remaining : total;
   }, 0);
 
+  // Calculate total downloads including free downloads
+  const totalDownloadsIncludingFree = totalDownloadsRemaining + freeDownloadsRemaining;
+  
+  // User can download if they have either free downloads or paid downloads
+  const canDownload = hasFreeDownloads || totalDownloadsRemaining > 0;
   const fetchPurchases = async () => {
     if (!user) {
       setLoading(false);
@@ -41,23 +47,6 @@ export const usePurchases = () => {
       
       console.log('Fetched purchases:', data);
       setPurchases(data || []);
-      
-      // Check if user has any valid downloads remaining
-      const hasValidPurchases = (data || []).some(purchase => {
-        const isNotExpired = !purchase.expires_at || new Date(purchase.expires_at) > new Date();
-        const hasDownloads = purchase.downloads_remaining > 0;
-        console.log('Purchase check:', {
-          id: purchase.id,
-          downloads_remaining: purchase.downloads_remaining,
-          isNotExpired,
-          hasDownloads,
-          expires_at: purchase.expires_at
-        });
-        return hasDownloads && isNotExpired;
-      });
-      
-      console.log('Can download:', hasValidPurchases);
-      setCanDownload(hasValidPurchases);
     } catch (error) {
       console.error('Error fetching purchases:', error);
     } finally {
@@ -65,18 +54,29 @@ export const usePurchases = () => {
     }
   };
 
-  const consumeDownload = async () => {
-    if (!user || !canDownload) return false;
+  const consumeDownload = async (): Promise<boolean> => {
+    if (!user) return false;
 
     try {
-      // Find the first valid purchase to consume from
+
+      // First try to use free downloads
+      if (hasFreeDownloads) {
+        console.log('Using free download');
+        return await consumeFreeDownload();
+      }
+      
+      // If no free downloads, use paid downloads
       const validPurchase = purchases.find(purchase => {
         const isNotExpired = !purchase.expires_at || new Date(purchase.expires_at) > new Date();
         return purchase.downloads_remaining > 0 && isNotExpired;
       });
 
-      if (!validPurchase) return false;
+      if (!validPurchase) {
+        console.log('No valid downloads remaining');
+        return false;
+      }
 
+      console.log('Using paid download from purchase:', validPurchase.id);
       const { error } = await supabase
         .from('purchases')
         .update({
@@ -128,8 +128,10 @@ export const usePurchases = () => {
   return {
     purchases,
     canDownload,
+    hasFreeDownloads,
+    freeDownloadsRemaining,
     loading,
-    totalDownloadsRemaining,
+    totalDownloadsRemaining: totalDownloadsIncludingFree,
     consumeDownload,
     refreshPurchases: fetchPurchases,
   };
