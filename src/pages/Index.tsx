@@ -22,6 +22,7 @@ import {
   Rocket,
   Globe,
   Heart,
+  Gift,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { PricingSection } from "@/components/PricingSection";
@@ -143,8 +144,8 @@ const Index = () => {
             <div className="space-y-8">
               <div className="space-y-6">
                 <Badge className="bg-blue-100 text-blue-700 border-blue-200 px-4 py-2 text-sm font-medium">
-                  <Sparkles className="w-4 h-4 mr-2" />
-                  AI-Powered Resume Builder
+                  <Gift className="w-4 h-4 mr-2" />
+                  1 Free Download • No Credit Card Required
                 </Badge>
 
                 <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
@@ -159,7 +160,7 @@ const Index = () => {
                 <p className="text-xl text-gray-600 leading-relaxed">
                   Create a professional, ATS-optimized resume that gets you
                   noticed. Join 50,000+ job seekers who landed their dream jobs
-                  with our platform.
+                  with our platform. Get your first download free!
                 </p>
               </div>
 
@@ -169,8 +170,8 @@ const Index = () => {
                     size="lg"
                     className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-xl hover:shadow-2xl transition-all duration-300 text-lg px-8 py-4"
                   >
-                    <Rocket className="w-5 h-5 mr-2" />
-                    Start Building Free
+                    <Gift className="w-5 h-5 mr-2" />
+                    Get 1 Free Download
                   </Button>
                 </Link>
                 <Link to="/templates">
@@ -473,7 +474,7 @@ const Index = () => {
           </div>
 
           <p className="text-blue-200 text-sm mt-6">
-            No credit card required • Free forever • Premium features available
+            1 free download included • No credit card required • Premium plans available
           </p>
         </div>
       </section>

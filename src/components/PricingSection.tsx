@@ -7,14 +7,15 @@ import { Link } from "react-router-dom";
 export const PricingSection = ({ showTitle = true }: { showTitle?: boolean }) => {
   const plans = [
     {
-      name: "Free Preview",
+      name: "Free Download",
       price: "₹0",
-      description: "Build and preview your resume",
+      description: "One free download to get started",
       features: [
+        "1 free PDF download",
         "Live preview",
-        "Basic template",
+        "All templates",
         "Online sharing",
-        "Limited customization"
+        "No watermark"
       ],
       cta: "Get Started",
       popular: false,
