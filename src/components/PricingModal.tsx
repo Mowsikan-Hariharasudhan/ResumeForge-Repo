@@ -1,2 +1,26 @@
+import React from 'react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { PricingSection } from '@/components/PricingSection';
 
-{"code":"rate-limited","message":"You have hit the rate limit. Please upgrade to keep chatting.","providerLimitHit":false,"isRetryable":true}
+interface PricingModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export const PricingModal: React.FC<PricingModalProps> = ({ isOpen, onClose }) => {
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Choose Your Plan</DialogTitle>
+        </DialogHeader>
+        <PricingSection />
+      </DialogContent>
+    </Dialog>
+  );
+};
