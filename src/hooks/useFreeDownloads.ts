@@ -33,8 +33,8 @@ export const useFreeDownloads = () => {
 
       if (error) {
         console.error('Error fetching free downloads:', error);
-        // If no record exists, initialize it
-        if (error.code === 'PGRST116') {
+        // If table doesn't exist or no record exists, initialize it
+        if (error.code === 'PGRST116' || error.code === '42P01') {
           await initializeFreeDownloads();
           return;
         }
@@ -45,11 +45,14 @@ export const useFreeDownloads = () => {
       setFreeDownloads(data);
     } catch (error) {
       console.error('Error fetching free downloads:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load download information",
-        variant: "destructive",
-      });
+      // Don't show error toast for missing table - it will be created
+      if (error?.code !== '42P01') {
+        toast({
+          title: "Error",
+          description: "Failed to load download information",
+          variant: "destructive",
+        });
+      }
     } finally {
       setLoading(false);
     }
